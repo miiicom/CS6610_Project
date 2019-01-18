@@ -31,3 +31,16 @@ void GLDisplayWidget::paintGL() {
 void GLDisplayWidget::initializeGL() {
 	glewInit();
 }
+
+void GLDisplayWidget::mouseMoveEvent(QMouseEvent * event)
+{
+	event->ignore(); // pass event down to the MainWidget (logic widget)
+}
+void GLDisplayWidget::mousePressEvent(QMouseEvent * event)
+{
+	event->ignore();
+}
+void GLDisplayWidget::mouseReleaseEvent(QMouseEvent * event)
+{
+	event->ignore();
+}

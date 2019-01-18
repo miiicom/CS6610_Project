@@ -19,6 +19,8 @@ object_script.*.Debug
 *.pro.user.*
 *.qbs.user
 *.qbs.user.*
+*.db
+*.opendb
 *.moc
 moc_*.cpp
 moc_*.h
