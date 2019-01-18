@@ -4,9 +4,13 @@
     <ClCompile Include="MainWidget.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="GLDisplayWidget.cpp" />
+    <ClCompile Include="ShapeGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainWidget.h" />
     <ClInclude Include="GLDisplayWidget.h" />
+    <ClInclude Include="vertex.h" />
+    <ClInclude Include="ShapeData.h" />
+    <ClInclude Include="ShapeGenerator.h" />
   </ItemGroup>
 </Project>

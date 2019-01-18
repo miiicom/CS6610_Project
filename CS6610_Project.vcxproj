@@ -78,7 +78,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)GL\glew\Include;$(ProjectDir);$(ProjectDir)GL\Qt\Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)GL\glm;$(ProjectDir)GL\glew\Include;$(ProjectDir);$(ProjectDir)GL\Qt\Include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(projectDir)GL\glew\lib;$(projectDir)GL\Qt\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -125,10 +125,14 @@
     <ClCompile Include="GLDisplayWidget.cpp" />
     <ClCompile Include="MainWidget.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="ShapeGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GLDisplayWidget.h" />
     <ClInclude Include="MainWidget.h" />
+    <ClInclude Include="ShapeData.h" />
+    <ClInclude Include="ShapeGenerator.h" />
+    <ClInclude Include="vertex.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

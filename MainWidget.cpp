@@ -12,7 +12,7 @@ MainWidget::MainWidget()
 	setLayout(mainLayout = new QVBoxLayout);
 	mainLayout->addWidget(displayWidget);
 
-	//startTimer(50);
+	startTimer(50);
 }
 
 MainWidget::~MainWidget()
@@ -51,22 +51,10 @@ void MainWidget::keyPressEvent(QKeyEvent *event)
 		displayWidget->repaint();
 	}
 
-	if (event->key() == Qt::Key_R)
+	if (event->key() == Qt::Key_Escape)
 	{
-		printf("up");
-		displayWidget->repaint();
-	}
-
-	if (event->key() == Qt::Key_F)
-	{
-		printf("down");
-		displayWidget->repaint();
-	}
-
-	if (event->key() == Qt::Key_G)
-	{
-		printf("left");
-		displayWidget->repaint();
+		printf("esc");
+		QCoreApplication::quit();
 	}
 }
 
