@@ -12,7 +12,7 @@ MainWidget::MainWidget()
 	setLayout(mainLayout = new QVBoxLayout);
 	mainLayout->addWidget(displayWidget);
 
-	startTimer(300);
+	startTimer(50);
 }
 void MainWidget::timerEvent(QTimerEvent *event) {
 	printf("time passes\n");
