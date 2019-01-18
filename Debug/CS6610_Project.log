@@ -1,0 +1,3 @@
+﻿  Source.cpp
+c:\users\u1137972\source\repos\cs6610_project\source.cpp(1): warning C4326: return type of 'main' should be 'int' instead of 'void'
+  CS6610_Project.vcxproj -> C:\Users\U1137972\source\repos\CS6610_Project\Debug\CS6610_Project.exe
