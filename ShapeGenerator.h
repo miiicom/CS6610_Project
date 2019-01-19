@@ -8,4 +8,7 @@ public:
 	static ShapeData readObj(const char* path);
 	ShapeGenerator();
 	~ShapeGenerator();
+
+protected:
+
 };

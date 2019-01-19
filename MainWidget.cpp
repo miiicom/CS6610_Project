@@ -12,7 +12,7 @@ MainWidget::MainWidget()
 	setLayout(mainLayout = new QVBoxLayout);
 	mainLayout->addWidget(displayWidget);
 
-	startTimer(50);
+	//startTimer(50);
 }
 
 MainWidget::~MainWidget()

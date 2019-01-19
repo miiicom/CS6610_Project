@@ -5,6 +5,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="GLDisplayWidget.cpp" />
     <ClCompile Include="ShapeGenerator.cpp" />
+    <ClCompile Include="MeCamera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainWidget.h" />
@@ -12,5 +13,19 @@
     <ClInclude Include="vertex.h" />
     <ClInclude Include="ShapeData.h" />
     <ClInclude Include="ShapeGenerator.h" />
+    <ClInclude Include="MeCamera.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\passThroughFragmentShader.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\passThroughVertexShader.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{43e1bfe3-343a-44a3-abb2-146fdacfcc26}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>
