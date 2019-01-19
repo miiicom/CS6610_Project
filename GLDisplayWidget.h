@@ -11,6 +11,7 @@ public:
 	GLDisplayWidget();
 	~GLDisplayWidget();
 	void ClockTick();
+	void installShaders();
 	MeCamera * meCamera;
 
 protected:
@@ -26,7 +27,7 @@ protected:
 	bool checkShaderStatus(GLuint shaderID);
 	bool checkProgramStatus(GLuint programID);
 	std::string readShaderCode(const char * filename);
-	void installShaders();
+	
 private:
 	float time;
 

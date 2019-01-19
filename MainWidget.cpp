@@ -63,6 +63,12 @@ void MainWidget::keyPressEvent(QKeyEvent *event)
 		printf("esc");
 		QCoreApplication::quit();
 	}
+
+	if (event->key() == Qt::Key_F6)
+	{
+		printf("recomplie Shader");
+		displayWidget->installShaders();
+	}
 }
 
 void MainWidget::mousePressEvent(QMouseEvent * event)
