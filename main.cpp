@@ -3,6 +3,7 @@
 #include <GLDisplayWidget.h>
 #include <MainWidget.h>
 #include <Qt/qapplication.h>
+#include <iostream>
 int main(int argc, char* argv[]) {
 	QApplication app(argc, argv);
 	printf("test %s", argv[1]);
@@ -10,7 +11,6 @@ int main(int argc, char* argv[]) {
 	MainWidget mymainWidget;
 	mymainWidget.setFixedSize(1024, 1024);
 	mymainWidget.show();
-
 	return app.exec();
 
 }

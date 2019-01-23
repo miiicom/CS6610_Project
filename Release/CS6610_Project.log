@@ -1,0 +1,10 @@
+﻿  GLDisplayWidget.cpp
+c:\users\u1137972\source\repos\cs6610_project\gldisplaywidget.cpp(1): fatal error C1083: Cannot open include file: 'gl/glew.h': No such file or directory
+  MainWidget.cpp
+c:\users\u1137972\source\repos\cs6610_project\mainwidget.h(2): fatal error C1083: Cannot open include file: 'QtGui\qwidget.h': No such file or directory
+  main.cpp
+c:\users\u1137972\source\repos\cs6610_project\main.cpp(3): fatal error C1083: Cannot open include file: 'GLDisplayWidget.h': No such file or directory
+  MeCamera.cpp
+c:\users\u1137972\source\repos\cs6610_project\mecamera.h(2): fatal error C1083: Cannot open include file: 'glm\glm.hpp': No such file or directory
+  ShapeGenerator.cpp
+c:\users\u1137972\source\repos\cs6610_project\shapegenerator.h(2): fatal error C1083: Cannot open include file: 'ShapeData.h': No such file or directory

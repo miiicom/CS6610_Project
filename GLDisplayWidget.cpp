@@ -21,6 +21,11 @@ GLuint cubeIndexBufferID;
 GLuint cubeVertexArrayObjectID;
 GLuint cubeIndices;
 
+GLuint teapotVertexBufferID;
+GLuint teapotIndexBufferID;
+GLuint teapotVertexArrayObjectID;
+GLuint teapotIndices;
+
 GLDisplayWidget::GLDisplayWidget()
 {
 	time = 0.0;
@@ -49,8 +54,8 @@ void GLDisplayWidget::paintGL() {
 
 	glm::mat4 projectionMatrix = glm::perspective(60.0f, ((float)width()) / height(), 0.01f, 50.0f); // Projection matrix
 	modelTransformMatrix = glm::translate(mat4(), glm::vec3(0.0f, 0.0f, -3.0f)); // 
-	modelRotateMatrix = glm::rotate(mat4(), +45.0f, glm::vec3(1.0f, 1.0f, 1.0f));
-	modelScaleMatrix = glm::scale(mat4(), glm::vec3(1.0f, 1.0f, 1.0f));
+	modelRotateMatrix = glm::rotate(mat4(), +0.0f, glm::vec3(1.0f, 1.0f, 1.0f));
+	modelScaleMatrix = glm::scale(mat4(), glm::vec3(0.2f, 0.2f,0.2f));
 
 	mat4 ModelToWorldMatrix = modelTransformMatrix * modelRotateMatrix *  modelScaleMatrix;
 	mat4 ModelToViewMatrix = meCamera->getWorldToViewMatrix() * ModelToWorldMatrix;
@@ -58,8 +63,8 @@ void GLDisplayWidget::paintGL() {
 
 	GLint fullTransformMatrixUniformLocation = glGetUniformLocation(PassThroughProgramID, "modelToProjectionMatrix");
 	glUniformMatrix4fv(fullTransformMatrixUniformLocation, 1, GL_FALSE, &fullTransformMatrix[0][0]);
-	glBindVertexArray(cubeVertexArrayObjectID);
-	glDrawElements(GL_TRIANGLES, cubeIndices, GL_UNSIGNED_SHORT, 0);
+	glBindVertexArray(teapotVertexArrayObjectID);
+	glDrawElements(GL_TRIANGLES, teapotIndices, GL_UNSIGNED_INT, 0);
 }
 
 void GLDisplayWidget::initializeGL() {
@@ -95,6 +100,30 @@ void GLDisplayWidget::sendDataToOpenGL() {
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, shape.indexBufferSize(), shape.indices, GL_STATIC_DRAW);
 	cubeIndices = shape.numIndices;
 	shape.cleanup();
+
+	std::ostream *outStream = &std::cout;
+	if (teapot.LoadFromFileObj("objs/teapot.obj", false, outStream)) {
+		printf("load success");
+	}
+	else {
+		printf("load fail");
+	}
+	//	;
+	//teapot.ComputeBoundingBox();
+	//if (teapot.IsBoundBoxReady()) {
+	//	cyPoint3f BBoxMax= teapot.GetBoundMax();
+	//	//cyPoint3f BBoxMax = teapot.GetBoundMax();
+	//	
+	//}
+
+	glGenBuffers(1, &teapotVertexBufferID);
+	glBindBuffer(GL_ARRAY_BUFFER, teapotVertexBufferID);
+	glBufferData(GL_ARRAY_BUFFER, teapot.NV() * sizeof(cyPoint3f), &teapot.V(0), GL_STATIC_DRAW);
+
+	glGenBuffers(1, &teapotIndexBufferID);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, teapotIndexBufferID);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, teapot.NF() * sizeof(unsigned int) *3 , &teapot.F(0), GL_STATIC_DRAW);
+	teapotIndices = teapot.NF()*3;
 }
 
 void GLDisplayWidget::setupVertexArrays()
@@ -110,6 +139,14 @@ void GLDisplayWidget::setupVertexArrays()
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * NUM_FLOATS_PER_VERTICE, (char*)(sizeof(float) * 3));
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * NUM_FLOATS_PER_VERTICE, (void*)(sizeof(float) * 6));
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeIndexBufferID);
+
+	glGenVertexArrays(1, &teapotVertexArrayObjectID);
+
+	glBindVertexArray(teapotVertexArrayObjectID);
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, teapotVertexBufferID);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 0, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, teapotIndexBufferID);
 }
 //--------------Shader utility functions
 bool  GLDisplayWidget::checkStatus(

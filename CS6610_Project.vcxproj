@@ -78,7 +78,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)GL\glm;$(ProjectDir)GL\glew\Include;$(ProjectDir);$(ProjectDir)GL\Qt\Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)GL\glm;$(ProjectDir)GL\Cy\Include;$(ProjectDir)GL\glew\Include;$(ProjectDir);$(ProjectDir)GL\Qt\Include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(projectDir)GL\glew\lib;$(projectDir)GL\Qt\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -139,6 +139,11 @@
   <ItemGroup>
     <None Include="shaders\passThroughFragmentShader.glsl" />
     <None Include="shaders\passThroughVertexShader.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="objs\teapot.obj">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </Object>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

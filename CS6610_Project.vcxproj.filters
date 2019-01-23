@@ -28,4 +28,7 @@
       <UniqueIdentifier>{43e1bfe3-343a-44a3-abb2-146fdacfcc26}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
+  <ItemGroup>
+    <Object Include="objs\teapot.obj" />
+  </ItemGroup>
 </Project>

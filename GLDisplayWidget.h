@@ -5,6 +5,10 @@
 #include <glm/glm.hpp>
 #include <String>
 #include <MeCamera.h>
+#include <vertex.h>
+#include <cyCore.h>
+#include <cyPoint.h>
+#include <cyTriMesh.h>
 class GLDisplayWidget :public QGLWidget
 {
 public:
@@ -30,6 +34,7 @@ protected:
 	
 private:
 	float time;
+	cyTriMesh teapot;
 
 	glm::mat4 modelTransformMatrix;
 	glm::mat4 modelRotateMatrix;

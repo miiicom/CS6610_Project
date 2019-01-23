@@ -1,5 +1,4 @@
 #include "ShapeGenerator.h"
-#include <vertex.h>
 #define NUM_ARRAY_ELEMENTS(a) sizeof(a)/ sizeof(*a)
 
 ShapeGenerator::ShapeGenerator()
@@ -14,7 +13,7 @@ ShapeGenerator::~ShapeGenerator()
 ShapeData ShapeGenerator::makeCube() {
 	ShapeData ret;
 	Vertex stackVerts[] =
-	{
+	{	// my test cube
 		glm::vec3(-1.0f, +1.0f, +1.0f),  // 0
 		glm::vec3(+1.0f, +0.0f, +0.0f),	// Color
 		glm::vec3(+0.0f, +1.0f, +0.0f),  // Normal
