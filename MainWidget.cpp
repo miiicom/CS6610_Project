@@ -68,6 +68,7 @@ void MainWidget::keyPressEvent(QKeyEvent *event)
 	{
 		printf("recomplie Shader");
 		displayWidget->installShaders();
+		displayWidget->repaint();
 	}
 }
 
