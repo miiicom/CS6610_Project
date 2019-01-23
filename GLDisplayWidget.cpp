@@ -53,7 +53,7 @@ void GLDisplayWidget::paintGL() {
 	glUseProgram(PassThroughProgramID);
 
 	glm::mat4 projectionMatrix = glm::perspective(60.0f, ((float)width()) / height(), 0.01f, 50.0f); // Projection matrix
-	modelTransformMatrix = glm::translate(mat4(), glm::vec3(0.0f, 0.0f, -3.0f)); // 
+	modelTransformMatrix = glm::translate(mat4(), glm::vec3(0.0f, 0.0f, -25.0f)); // 
 	modelRotateMatrix = glm::rotate(mat4(), +0.0f, glm::vec3(1.0f, 1.0f, 1.0f));
 	modelScaleMatrix = glm::scale(mat4(), glm::vec3(0.2f, 0.2f,0.2f));
 
