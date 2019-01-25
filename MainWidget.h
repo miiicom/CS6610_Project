@@ -8,6 +8,7 @@ class MainWidget : public QWidget
 public:
 	MainWidget();
 	~MainWidget();
+	void setReadObj(const char*);
 protected:
 	void timerEvent(QTimerEvent *event);
 	void keyPressEvent(QKeyEvent *);

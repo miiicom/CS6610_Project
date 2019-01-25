@@ -17,7 +17,7 @@ public:
 	void ClockTick();
 	void installShaders();
 	MeCamera * meCamera;
-
+	const char* ReadObjName;
 protected:
 	void paintGL();
 	void initializeGL();

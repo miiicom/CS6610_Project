@@ -10,6 +10,7 @@ int main(int argc, char* argv[]) {
 
 	MainWidget mymainWidget;
 	mymainWidget.setFixedSize(1024, 1024);
+	mymainWidget.setReadObj(argv[1]);
 	mymainWidget.show();
 	return app.exec();
 

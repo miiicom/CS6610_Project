@@ -33,6 +33,8 @@ GLDisplayWidget::GLDisplayWidget()
 {
 	time = 0.0;
 	meCamera = new MeCamera;
+	ReadObjName = "objs/teapot.obj";// default one
+	printf("read obj is %s", ReadObjName);
 }
 
 GLDisplayWidget::~GLDisplayWidget()
@@ -113,7 +115,7 @@ void GLDisplayWidget::sendDataToOpenGL() {
 	shape.cleanup();
 
 	std::ostream *outStream = &std::cout;
-	if (teapot.LoadFromFileObj("objs/teapot.obj", false, outStream)) {
+	if (teapot.LoadFromFileObj(ReadObjName, false, outStream)) {
 		printf("load success");
 	}
 	else {

@@ -19,6 +19,11 @@ MainWidget::~MainWidget()
 {
 }
 
+void MainWidget::setReadObj(const char * name)
+{
+	this->displayWidget->ReadObjName = name;
+}
+
 void MainWidget::timerEvent(QTimerEvent *event) {
 	printf("time passes\n");
 	displayWidget->ClockTick();
