@@ -37,7 +37,7 @@ GLDisplayWidget::GLDisplayWidget()
 	printf("read obj is %s", ReadObjName);
 
 	ambientAmount = glm::vec3(0.05f, 0.05f, 0.05f);
-	pointLight1Position = glm::vec3(0.00f, 0.00f, 20.00f);
+	pointLight1Position = glm::vec3(0.00f, 0.00f,20.00f);
 	pointLight1Intensity = 1.0f;
 }
 
