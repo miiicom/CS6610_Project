@@ -41,5 +41,9 @@ private:
 	glm::mat4 modelRotateMatrix;
 	glm::mat4 modelScaleMatrix;
 	glm::mat4 projectionMatrix;
+
+	glm::vec3 ambientAmount;
+	glm::vec3 pointLight1Position;
+	float pointLight1Intensity;
 };
 

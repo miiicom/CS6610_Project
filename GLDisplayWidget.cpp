@@ -35,6 +35,10 @@ GLDisplayWidget::GLDisplayWidget()
 	meCamera = new MeCamera;
 	ReadObjName = "objs/teapot.obj";// default one
 	printf("read obj is %s", ReadObjName);
+
+	ambientAmount = glm::vec3(0.05f, 0.05f, 0.05f);
+	pointLight1Position = glm::vec3(0.00f, 0.00f, 20.00f);
+	pointLight1Intensity = 1.0f;
 }
 
 GLDisplayWidget::~GLDisplayWidget()
@@ -52,7 +56,7 @@ void GLDisplayWidget::paintGL() {
 	//float newGreenColor = ((int)time) % 20;
 	//float newBlueColor = ((int)time) % 20;
 	//printf("color is %f", newRedColor);
-	glClearColor(1.0, 1.0, 1.0, 1.0);
+	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 	glViewport(0, 0, width(), height());
 	glUseProgram(PassThroughProgramID);
@@ -71,6 +75,17 @@ void GLDisplayWidget::paintGL() {
 
 	GLint fullTransformMatrixUniformLocation = glGetUniformLocation(PassThroughProgramID, "modelToProjectionMatrix");
 	glUniformMatrix4fv(fullTransformMatrixUniformLocation, 1, GL_FALSE, &fullTransformMatrix[0][0]);
+	GLint modelToWroldMatrixUniformLocation = glGetUniformLocation(PassThroughProgramID, "modelToWorldTransMatrix");
+	glUniformMatrix4fv(modelToWroldMatrixUniformLocation, 1, GL_FALSE, &ModelToWorldMatrix[0][0]);
+	GLint ambientUniformLocation = glGetUniformLocation(PassThroughProgramID, "ambientLightUniform");
+	glUniform3fv(ambientUniformLocation, 1, &ambientAmount[0]);
+	GLint Light1PositionUniformLocation = glGetUniformLocation(PassThroughProgramID, "pointLightPosition");
+	glUniform3fv(Light1PositionUniformLocation, 1, &pointLight1Position[0]);
+	GLint Light1IntensityUniformLocation = glGetUniformLocation(PassThroughProgramID, "pointLightIntensity");
+	glUniform1f(Light1PositionUniformLocation, pointLight1Intensity);
+	GLuint cameraUniformLocation = glGetUniformLocation(PassThroughProgramID, "cameraPositionWorld");
+	glm::vec3 cameraPosition = meCamera->position;
+	glUniform3fv(cameraUniformLocation, 1, &cameraPosition[0]);
 	glBindVertexArray(teapotVertexArrayObjectID);
 	glDrawElements(GL_TRIANGLES, teapotIndices, GL_UNSIGNED_INT, 0);
 }
@@ -127,15 +142,28 @@ void GLDisplayWidget::sendDataToOpenGL() {
 		BBoxMin = teapot.GetBoundMin();
 		//cyPoint3f BBoxMax = teapot.GetBoundMax();
 	}
+	//INTERWEAVE two sets of information together into a vector. Dont know if it is efficient
+	std::vector<cyPoint3f> teapotVertices;
+	for (int i = 0; i < teapot.NV(); i++) {
+		teapotVertices.push_back(teapot.V(i));
+		teapotVertices.push_back(teapot.VN(i));
+	}
+	printf("teapot vertices buffer is %d size large\n", teapotVertices.size());
+	printf("teapot has %d vertices\n", teapot.NV());
 
 	glGenBuffers(1, &teapotVertexBufferID);
 	glBindBuffer(GL_ARRAY_BUFFER, teapotVertexBufferID);
-	glBufferData(GL_ARRAY_BUFFER, teapot.NV() * sizeof(cyPoint3f), &teapot.V(0), GL_STATIC_DRAW);
+	// read vertex position info only
+	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, teapot.NF() * sizeof(unsigned int) *3 , &teapot.F(0), GL_STATIC_DRAW);
+	// read vertex information from a vector
+	glBufferData(GL_ARRAY_BUFFER, teapot.NV() * sizeof(cyPoint3f) * 2, &teapotVertices[0], GL_STATIC_DRAW);
+	
 
 	glGenBuffers(1, &teapotIndexBufferID);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, teapotIndexBufferID);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, teapot.NF() * sizeof(unsigned int) *3 , &teapot.F(0), GL_STATIC_DRAW);
-	teapotIndices = teapot.NF()*3;
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, teapot.NF() * sizeof(unsigned int) * 3, &teapot.F(0), GL_STATIC_DRAW);
+	teapotIndices = teapot.NF() * 3;
+
 }
 
 void GLDisplayWidget::setupVertexArrays()
@@ -156,8 +184,10 @@ void GLDisplayWidget::setupVertexArrays()
 
 	glBindVertexArray(teapotVertexArrayObjectID);
 	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
 	glBindBuffer(GL_ARRAY_BUFFER, teapotVertexBufferID);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 0, 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(cyPoint3f) * 2, 0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(cyPoint3f) * 2, (void*)(sizeof(float) * 3));
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, teapotIndexBufferID);
 }
 //--------------Shader utility functions
