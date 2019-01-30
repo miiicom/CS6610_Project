@@ -31,6 +31,9 @@ cyPoint3f BBoxMin;
 
 GLDisplayWidget::GLDisplayWidget()
 {
+	XDegree = 0.0;
+	YDegree = 0.0;
+
 	time = 0.0;
 	meCamera = new MeCamera;
 	ReadObjName = "objs/teapot.obj";// default one
@@ -66,7 +69,7 @@ void GLDisplayWidget::paintGL() {
 	//modelTransformMatrix = glm::translate(mat4(), glm::vec3(0.0f, 0.0f, (BBoxMax.z + BBoxMin.z) / 2.0f * 0.2f)); // Because I scale by 0.2, I need to cut my BBOX by 0.2
 	//modelTransformMatrix = glm::translate(mat4(), glm::vec3(0.0f,0.0f,0.0f)); // Because I scale by 0.2, I need to cut my BBOX by 0.2
 	printf("Offset is %f in X, %f in Y, %f in z \n", (BBoxMax.x + BBoxMin.x) / 2.0f * 0.2f, (BBoxMax.y + BBoxMin.y) / 2.0f * 0.2f, (BBoxMax.z + BBoxMin.z) / 2.0f * 0.2f);
-	modelRotateMatrix = glm::rotate(mat4(), +0.0f, glm::vec3(1.0f, 1.0f, 1.0f));
+	modelRotateMatrix = glm::rotate(mat4(), -90.0f, glm::vec3(1.0f, 0.0f, 0.0f));
 	modelScaleMatrix = glm::scale(mat4(), glm::vec3(0.2f,0.2f,0.2f));
 
 	mat4 ModelToWorldMatrix = modelTransformMatrix * modelRotateMatrix *  modelScaleMatrix;
@@ -148,6 +151,7 @@ void GLDisplayWidget::sendDataToOpenGL() {
 		teapotVertices.push_back(teapot.V(i));
 		teapotVertices.push_back(teapot.VN(i));
 	}
+
 	printf("teapot vertices buffer is %d size large\n", teapotVertices.size());
 	printf("teapot has %d vertices\n", teapot.NV());
 
@@ -268,4 +272,12 @@ void GLDisplayWidget::installShaders() {
 	if (!checkProgramStatus(PassThroughProgramID)) {
 		return;
 	}
+}
+
+void GLDisplayWidget::setPointLightPosition(float Xmovement, float Ymovement)
+{
+	glm::vec3 previousPosition = this->pointLight1Position;
+	XDegree += Xmovement / 100;
+	YDegree += Ymovement / 100;
+	this->pointLight1Position = glm::vec3(sin(XDegree) * 100,cos(YDegree) * 100, previousPosition.z);
 }

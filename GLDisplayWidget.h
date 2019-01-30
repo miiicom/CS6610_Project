@@ -16,6 +16,7 @@ public:
 	~GLDisplayWidget();
 	void ClockTick();
 	void installShaders();
+	void setPointLightPosition(float Xmovement, float Ymovement);
 	MeCamera * meCamera;
 	const char* ReadObjName;
 protected:
@@ -36,14 +37,14 @@ protected:
 private:
 	float time;
 	cyTriMesh teapot;
-
+	float XDegree;
+	float YDegree;
 	glm::mat4 modelTransformMatrix;
 	glm::mat4 modelRotateMatrix;
 	glm::mat4 modelScaleMatrix;
 	glm::mat4 projectionMatrix;
-
-	glm::vec3 ambientAmount;
 	glm::vec3 pointLight1Position;
+	glm::vec3 ambientAmount;
 	float pointLight1Intensity;
 };
 

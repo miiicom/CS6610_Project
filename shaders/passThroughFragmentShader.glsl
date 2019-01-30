@@ -14,7 +14,7 @@ void main()
 	// diffuse
 	vec3 lightVectorWorld = normalize(pointLightPosition - VertexPositionWorld);
 	float diffuseIntensity = dot(lightVectorWorld,normalize(NormalWorld));
-	vec4 diffuseLight = vec4(diffuseIntensity,0.2 *diffuseIntensity,0.6* diffuseIntensity,1.0);
+	vec4 diffuseLight = vec4(0.2 *diffuseIntensity,0.6 *diffuseIntensity,diffuseIntensity,1.0);
 
 	//specular
 	vec3 reflectedLightVectorWorld = reflect(lightVectorWorld, normalize(NormalWorld));

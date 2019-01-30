@@ -75,6 +75,22 @@ void MainWidget::keyPressEvent(QKeyEvent *event)
 		displayWidget->installShaders();
 		displayWidget->repaint();
 	}
+
+	if (event->key() == Qt::Key_Control)
+	{
+		printf("ctrl pressed");
+		IsCtrlPressing = true;
+	}
+	
+}
+
+void MainWidget::keyReleaseEvent(QKeyEvent *event)
+{
+	if (event->key() == Qt::Key_Control)
+	{
+		printf("ctrl pressed");
+		IsCtrlPressing = false;
+	}
 }
 
 void MainWidget::mousePressEvent(QMouseEvent * event)
@@ -85,7 +101,7 @@ void MainWidget::mousePressEvent(QMouseEvent * event)
 		if (hasMouseTracking()) {
 			printf("tracking\n");
 		}
-		IsPressing = true;
+
 		dragStartPosition = event->pos();
 	}
 }
@@ -98,24 +114,28 @@ void MainWidget::mouseReleaseEvent(QMouseEvent * event)
 		if (hasMouseTracking()) {
 			printf("tracking\n");
 		}
-		IsPressing = false;
 	}
 }
 
 void MainWidget::mouseMoveEvent(QMouseEvent * event)
 {
+	if ((event->pos() - dragStartPosition).manhattanLength()
+		< QApplication::startDragDistance())
+		return;
+	float xMovement = event->pos().x() - dragStartPosition.x();
+	float yMovement = event->pos().y() - dragStartPosition.y();
+
+	dragStartPosition = event->pos();
 	if (event->buttons() & Qt::LeftButton) {
-		if ((event->pos() - dragStartPosition).manhattanLength()
-			< QApplication::startDragDistance())
-			return;
-		float xMovement = event->pos().x() - dragStartPosition.x();
-		float yMovement = event->pos().y() - dragStartPosition.y();
-
-		dragStartPosition = event->pos();
-
-		displayWidget->meCamera->mouseUpdate(glm::vec2(xMovement, yMovement));
-		printf("Dragging in main Widget\n");
-		displayWidget->repaint();
+		if (IsCtrlPressing) {
+			displayWidget->setPointLightPosition(xMovement, yMovement);
+			displayWidget->repaint();
+		}
+		else{
+			displayWidget->meCamera->mouseUpdate(glm::vec2(xMovement, yMovement));
+			printf("Dragging in main Widget\n");
+			displayWidget->repaint();
+		}
 	}
 
 	if (event->buttons() & Qt::RightButton) {

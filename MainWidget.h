@@ -12,11 +12,12 @@ public:
 protected:
 	void timerEvent(QTimerEvent *event);
 	void keyPressEvent(QKeyEvent *);
+	void keyReleaseEvent(QKeyEvent *);
 	void mousePressEvent(QMouseEvent *event);
 	void mouseReleaseEvent(QMouseEvent *event);
 	void mouseMoveEvent(QMouseEvent *event);
 private:
 	GLDisplayWidget * displayWidget;
 	QPoint dragStartPosition;
-	bool IsPressing;
+	bool IsCtrlPressing;
 };
