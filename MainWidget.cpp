@@ -138,22 +138,22 @@ void MainWidget::mouseMoveEvent(QMouseEvent * event)
 		}
 	}
 
-	if (event->buttons() & Qt::RightButton) {
-		if ((event->pos() - dragStartPosition).manhattanLength()
-			< QApplication::startDragDistance())
-			return;
-		float xMovement = event->pos().x() - dragStartPosition.x();
-		float yMovement = event->pos().y() - dragStartPosition.y();
+	//if (event->buttons() & Qt::RightButton) {
+	//	if ((event->pos() - dragStartPosition).manhattanLength()
+	//		< QApplication::startDragDistance())
+	//		return;
+	//	float xMovement = event->pos().x() - dragStartPosition.x();
+	//	float yMovement = event->pos().y() - dragStartPosition.y();
 
-		dragStartPosition = event->pos();
-		if (yMovement >= 0.0) {
-			displayWidget->meCamera->moveForward();
-		}
-		else {
-			displayWidget->meCamera->moveBackward();
-		}
-		printf("Dragging in main Widget\n");
-		displayWidget->repaint();
-	}
+	//	dragStartPosition = event->pos();
+	//	if (yMovement >= 0.0) {
+	//		displayWidget->meCamera->moveForward();
+	//	}
+	//	else {
+	//		displayWidget->meCamera->moveBackward();
+	//	}
+	//	printf("Dragging in main Widget\n");
+	//	displayWidget->repaint();
+	//}
 
 }

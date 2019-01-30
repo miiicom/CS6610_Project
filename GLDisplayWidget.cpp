@@ -106,6 +106,11 @@ void GLDisplayWidget::keyPressEvent(QKeyEvent * event)
 	event->ignore();
 }
 
+void GLDisplayWidget::keyReleaseEvent(QKeyEvent * event)
+{
+	event->ignore();
+}
+
 void GLDisplayWidget::mouseMoveEvent(QMouseEvent * event)
 {
 	event->ignore(); // pass event down to the MainWidget (logic widget)
