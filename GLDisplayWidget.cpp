@@ -146,12 +146,6 @@ void GLDisplayWidget::sendDataToOpenGL() {
 	}
 	const char *diffuseMapName = teapot.M(0).map_Kd.data;
 	const char *specularMapName = teapot.M(0).map_Ks.data;
-	std::string myDiffuseMapNam = diffuseMapName;
-	std::string mySpecularMapNam = specularMapName;
-	//std::string DiffuseMapPath = "texture/" + myDiffuseMapNam;
-	//std::string SpecularMapPath = "texture/" + mySpecularMapNam;
-	printf("\n the diffuse texture is %s \n", myDiffuseMapNam);
-	printf("\n the specular texture is %s \n", mySpecularMapNam);
 
 	teapot.ComputeBoundingBox();
 	if (teapot.IsBoundBoxReady()) {
