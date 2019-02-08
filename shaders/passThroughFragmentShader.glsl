@@ -1,6 +1,7 @@
 #version 430
 in vec3 NormalWorld;
 in vec3 VertexPositionWorld;
+in vec2 fragmentUV;
 
 out vec4 FragmentColor;
 
@@ -22,9 +23,10 @@ void main()
 	float SpecIntensity =  dot(cameraToWorld,reflectedLightVectorWorld);
 	SpecIntensity = pow(SpecIntensity,6);
 	vec4 specLight = vec4(SpecIntensity,SpecIntensity,SpecIntensity,1.0);
-	FragmentColor = clamp(diffuseLight,0,1) + vec4(ambientLightUniform,0.0) + clamp(specLight,0,1);
+	//FragmentColor = clamp(diffuseLight,0,1) + vec4(ambientLightUniform,0.0) + clamp(specLight,0,1);
 	//FragmentColor = vec4(normalize(cameraPositionWorld),1.0);
 	//FragmentColor =clamp(specLight,0,1);
 	//FragmentColor = vec4(normalize(NormalWorld),1.0);
 	//FragmentColor = vec4(0.0,0.0,0.0,1.0);
+	FragmentColor = vec4(fragmentUV.x,fragmentUV.y,0.0,1.0);
 }

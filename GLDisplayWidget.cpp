@@ -144,7 +144,7 @@ void GLDisplayWidget::sendDataToOpenGL() {
 	else {
 		printf("load fail");
 	}
-
+	// in here get obj map name
 	const char *diffuseMapName = teapot.M(0).map_Kd.data;
 	const char *specularMapName = teapot.M(0).map_Ks.data;
 	std::string filePrefix = "Textures/";
@@ -196,6 +196,7 @@ void GLDisplayWidget::sendDataToOpenGL() {
 	for (int i = 0; i < teapot.NV(); i++) {
 		teapotVertices.push_back(teapot.V(i));
 		teapotVertices.push_back(teapot.VN(i));
+		teapotVertices.push_back(teapot.VT(i));
 	}
 
 	printf("teapot vertices buffer is %d size large\n", teapotVertices.size());
@@ -206,7 +207,7 @@ void GLDisplayWidget::sendDataToOpenGL() {
 	// read vertex position info only
 	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, teapot.NF() * sizeof(unsigned int) *3 , &teapot.F(0), GL_STATIC_DRAW);
 	// read vertex information from a vector
-	glBufferData(GL_ARRAY_BUFFER, teapot.NV() * sizeof(cyPoint3f) * 2, &teapotVertices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, teapot.NV() * sizeof(cyPoint3f) * 3, &teapotVertices[0], GL_STATIC_DRAW);
 	
 
 	glGenBuffers(1, &teapotIndexBufferID);
@@ -235,9 +236,11 @@ void GLDisplayWidget::setupVertexArrays()
 	glBindVertexArray(teapotVertexArrayObjectID);
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
 	glBindBuffer(GL_ARRAY_BUFFER, teapotVertexBufferID);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(cyPoint3f) * 2, 0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(cyPoint3f) * 2, (void*)(sizeof(float) * 3));
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(cyPoint3f) * 3, 0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(cyPoint3f) * 3, (void*)(sizeof(float) * 3));
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(cyPoint3f) * 3, (void*)(sizeof(float) * 6));
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, teapotIndexBufferID);
 }
 //--------------Shader utility functions
