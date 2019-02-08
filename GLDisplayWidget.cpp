@@ -92,7 +92,7 @@ void GLDisplayWidget::paintGL() {
 	GLuint diffuseMapUniformLocation = glGetUniformLocation(PassThroughProgramID, "diffuseTexture");
 	glUniform1i(diffuseMapUniformLocation, 0);
 	GLuint speculareMapUniformLocation = glGetUniformLocation(PassThroughProgramID, "specularTexture");
-	glUniform1i(speculareMapUniformLocation, 1);
+	glUniform1i(speculareMapUniformLocation, 0);
 	glBindVertexArray(teapotVertexArrayObjectID);
 	glDrawElements(GL_TRIANGLES, teapotIndices, GL_UNSIGNED_INT, 0);
 }
@@ -155,10 +155,6 @@ void GLDisplayWidget::sendDataToOpenGL() {
 	filePrefix.append(diffuseMapName);
 	diffuseMapName = filePrefix.c_str();
 	printf("\nthe spec name is %s\n", diffuseMapName);
-	filePrefix = "Textures/";
-	filePrefix.append(specularMapName);
-	specularMapName = filePrefix.c_str();
-	printf("\nthe diffuse name is %s\n", specularMapName);
 
 	QImage diffuseMap = loadTexture(diffuseMapName);
 	// send Image to OpenGL
@@ -173,6 +169,11 @@ void GLDisplayWidget::sendDataToOpenGL() {
 		GL_LINEAR);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
 		GL_LINEAR);
+
+	filePrefix = "Textures/";
+	filePrefix.append(specularMapName);
+	specularMapName = filePrefix.c_str();
+	printf("\nthe diffuse name is %s\n", specularMapName);
 
 	QImage SpecMap = loadTexture(specularMapName);
 	// send Image to OpenGL
