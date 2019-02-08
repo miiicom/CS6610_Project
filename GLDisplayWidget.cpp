@@ -92,7 +92,7 @@ void GLDisplayWidget::paintGL() {
 	GLuint diffuseMapUniformLocation = glGetUniformLocation(PassThroughProgramID, "diffuseTexture");
 	glUniform1i(diffuseMapUniformLocation, 0);
 	GLuint speculareMapUniformLocation = glGetUniformLocation(PassThroughProgramID, "specularTexture");
-	glUniform1i(speculareMapUniformLocation, 0);
+	glUniform1i(speculareMapUniformLocation, 1);
 	glBindVertexArray(teapotVertexArrayObjectID);
 	glDrawElements(GL_TRIANGLES, teapotIndices, GL_UNSIGNED_INT, 0);
 }
