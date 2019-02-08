@@ -144,8 +144,46 @@ void GLDisplayWidget::sendDataToOpenGL() {
 	else {
 		printf("load fail");
 	}
+
 	const char *diffuseMapName = teapot.M(0).map_Kd.data;
 	const char *specularMapName = teapot.M(0).map_Ks.data;
+	std::string filePrefix = "Textures/";
+	filePrefix.append(diffuseMapName);
+	diffuseMapName = filePrefix.c_str();
+	printf("\nthe spec name is %s\n", diffuseMapName);
+	filePrefix = "Textures/";
+	filePrefix.append(specularMapName);
+	specularMapName = filePrefix.c_str();
+	printf("\nthe diffuse name is %s\n", specularMapName);
+
+	QImage diffuseMap = loadTexture(diffuseMapName);
+	// send Image to OpenGL
+	glActiveTexture(GL_TEXTURE0);
+	GLuint diffusetextureID;
+	glGenTextures(1, &diffusetextureID);
+	glBindTexture(GL_TEXTURE_2D, diffusetextureID);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, diffuseMap.width(),
+		diffuseMap.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE,
+		diffuseMap.bits());
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+		GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+		GL_LINEAR);
+
+	QImage SpecMap = loadTexture(specularMapName);
+	// send Image to OpenGL
+	glActiveTexture(GL_TEXTURE1);
+	GLuint spectextureID;
+	glGenTextures(1, &spectextureID);
+	glBindTexture(GL_TEXTURE_2D, spectextureID);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, SpecMap.width(),
+		SpecMap.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE,
+		SpecMap.bits());
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+		GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+		GL_LINEAR);
+
 
 	teapot.ComputeBoundingBox();
 	if (teapot.IsBoundBoxReady()) {
@@ -246,6 +284,10 @@ string GLDisplayWidget::readShaderCode(const char * filename)
 			std::istreambuf_iterator<char>()
 		);
 	}
+}
+QImage GLDisplayWidget::loadTexture(const char * texName)
+{
+	return QGLWidget::convertToGLFormat(QImage(texName, "PNG"));
 }
 //--------------Shader utility functions
 

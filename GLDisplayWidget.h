@@ -47,5 +47,7 @@ private:
 	glm::vec3 pointLight1Position;
 	glm::vec3 ambientAmount;
 	float pointLight1Intensity;
+	QImage loadTexture(const char * texName);
+
 };
 
