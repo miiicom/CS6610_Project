@@ -89,6 +89,10 @@ void GLDisplayWidget::paintGL() {
 	GLuint cameraUniformLocation = glGetUniformLocation(PassThroughProgramID, "cameraPositionWorld");
 	glm::vec3 cameraPosition = meCamera->position;
 	glUniform3fv(cameraUniformLocation, 1, &cameraPosition[0]);
+	GLuint diffuseMapUniformLocation = glGetUniformLocation(PassThroughProgramID, "diffuseTexture");
+	glUniform1i(diffuseMapUniformLocation, 0);
+	GLuint speculareMapUniformLocation = glGetUniformLocation(PassThroughProgramID, "specularTexture");
+	glUniform1i(speculareMapUniformLocation, 1);
 	glBindVertexArray(teapotVertexArrayObjectID);
 	glDrawElements(GL_TRIANGLES, teapotIndices, GL_UNSIGNED_INT, 0);
 }
@@ -196,7 +200,7 @@ void GLDisplayWidget::sendDataToOpenGL() {
 	for (int i = 0; i < teapot.NV(); i++) {
 		teapotVertices.push_back(teapot.V(i));
 		teapotVertices.push_back(teapot.VN(i));
-		teapotVertices.push_back(teapot.VT(i));
+		teapotVertices.push_back(teapot.VT(i));	
 	}
 
 	printf("teapot vertices buffer is %d size large\n", teapotVertices.size());
