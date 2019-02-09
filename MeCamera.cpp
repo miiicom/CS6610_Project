@@ -5,7 +5,7 @@ const float MeCamera::MOVEMENT_SPEED = 0.1f;
 MeCamera::MeCamera() : UP(0.0f, 1.0f, 0.0f)
 {
 	viewDirection = glm::vec3(0.0f, 0.0f, -1.0f);
-	position = glm::vec3(0.0f, 0.0f,25.0f);
+	position = glm::vec3(0.0f, 0.0f,15.0f);
 }
 
 
@@ -68,5 +68,5 @@ void MeCamera::moveDown() {
 void MeCamera::reset()
 {
 	viewDirection = glm::vec3(0.0f, 0.0f, -1.0f);
-	position = glm::vec3(0.0f, 0.0f,25.0f);
+	position = glm::vec3(0.0f, 0.0f,15.0f);
 }

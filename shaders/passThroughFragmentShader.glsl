@@ -34,6 +34,6 @@ void main()
 	//FragmentColor = clamp(specLight,0,1);
 	//FragmentColor = vec4(normalize(NormalWorld),1.0);
 	//FragmentColor = vec4(0.0,0.0,0.0,1.0);
-	//FragmentColor = vec4(fragmentUV.x,fragmentUV.y,0.0,1.0);
+	//FragmentColor = vec4(fragmentUV.x,-fragmentUV.y,0.0,1.0);
 	//FragmentColor = specularColor;
 }
