@@ -16,131 +16,107 @@ ShapeData ShapeGenerator::makeCube() {
 	{	// my test cube
 		// Top
 		glm::vec3(-1.0f, +1.0f, +1.0f),        // 0
-		glm::vec4(+1.0f, +0.0f, +0.0f, +1.0f), // Color
 		glm::vec3(+0.0f, +1.0f, +0.0f),        // Normal
 		glm::vec2(+0.0f, +1.0f),               // UV
 
 		glm::vec3(+1.0f, +1.0f, +1.0f),        // 1
-		glm::vec4(+0.0f, +1.0f, +0.0f, +1.0f), // Color
 		glm::vec3(+0.0f, +1.0f, +0.0f),        // Normal
 		glm::vec2(+1.0f, +1.0f),               // UV
 
 		glm::vec3(+1.0f, +1.0f, -1.0f),        // 2
-		glm::vec4(+0.0f, +0.0f, +1.0f, +1.0f), // Color
 		glm::vec3(+0.0f, +1.0f, +0.0f),        // Normal
 		glm::vec2(+1.0f, +0.0f),               // UV
 
 		glm::vec3(-1.0f, +1.0f, -1.0f),        // 3
-		glm::vec4(+1.0f, +1.0f, +1.0f, +1.0f), // Color
 		glm::vec3(+0.0f, +1.0f, +0.0f),        // Normal
 		glm::vec2(+0.0f, +0.0f),               // UV
 
 
 		// Front
 		glm::vec3(-1.0f, +1.0f, -1.0f),        // 4
-		glm::vec4(+1.0f, +0.0f, +1.0f, +1.0f), // Color
 		glm::vec3(+0.0f, +0.0f, -1.0f),        // Normal
 		glm::vec2(+0.0f, +1.0f),               // UV
 
 		glm::vec3(+1.0f, +1.0f, -1.0f),        // 5
-		glm::vec4(+0.0f, +0.5f, +0.2f, +1.0f), // Color
 		glm::vec3(+0.0f, +0.0f, -1.0f),        // Normal
 		glm::vec2(+1.0f, +1.0f),               // UV
 
 		glm::vec3(+1.0f, -1.0f, -1.0f),        // 6
-		glm::vec4(+0.8f, +0.6f, +0.4f, +1.0f), // Color
 		glm::vec3(+0.0f, +0.0f, -1.0f),        // Normal
 		glm::vec2(+1.0f, +0.0f),               // UV
 
 		glm::vec3(-1.0f, -1.0f, -1.0f),        // 7
-		glm::vec4(+0.3f, +1.0f, +0.5f, +1.0f), // Color
 		glm::vec3(+0.0f, +0.0f, -1.0f),        // Normal
 		glm::vec2(+0.0f, +0.0f),               // UV
 		
 		// Right
 		glm::vec3(+1.0f, +1.0f, -1.0f),        // 8
-		glm::vec4(+0.2f, +0.5f, +0.2f, +1.0f), // Color
 		glm::vec3(+1.0f, +0.0f, +0.0f),        // Normal
 		glm::vec2(+1.0f, +0.0f),               // UV
 
 		glm::vec3(+1.0f, +1.0f, +1.0f),        // 9
-		glm::vec4(+0.9f, +0.3f, +0.7f, +1.0f), // Color
 		glm::vec3(+1.0f, +0.0f, +0.0f),        // Normal
 		glm::vec2(+0.0f, +0.0f),               // UV
 
 		glm::vec3(+1.0f, -1.0f, +1.0f),        // 10
-		glm::vec4(+0.3f, +0.7f, +0.5f, +1.0f), // Color
 		glm::vec3(+1.0f, +0.0f, +0.0f),        // Normal
 		glm::vec2(+0.0f, +1.0f),               // UV
 
 		glm::vec3(+1.0f, -1.0f, -1.0f),        // 11
-		glm::vec4(+0.5f, +0.7f, +0.5f, +1.0f), // Color
 		glm::vec3(+1.0f, +0.0f, +0.0f),        // Normal
 		glm::vec2(+1.0f, +1.0f),               // UV
 
 		
 		// Left
 		glm::vec3(-1.0f, +1.0f, +1.0f),        // 12
-		glm::vec4(+0.7f, +0.8f, +0.2f, +1.0f), // Color
 		glm::vec3(-1.0f, +0.0f, +0.0f),        // Normal
 		glm::vec2(+1.0f, +0.0f),               // UV
 
 		glm::vec3(-1.0f, +1.0f, -1.0f),        // 13
-		glm::vec4(+0.5f, +0.7f, +0.3f, +1.0f), // Color
 		glm::vec3(-1.0f, +0.0f, +0.0f),        // Normal
 		glm::vec2(+0.0f, +0.0f),               // UV
 
 		glm::vec3(-1.0f, -1.0f, -1.0f),        // 14
-		glm::vec4(+0.4f, +0.7f, +0.7f, +1.0f), // Color
 		glm::vec3(-1.0f, +0.0f, +0.0f),        // Normal
 		glm::vec2(+0.0f, +1.0f),               // UV
 
 		glm::vec3(-1.0f, -1.0f, +1.0f),        // 15
-		glm::vec4(+0.2f, +0.5f, +1.0f, +1.0f), // Color
 		glm::vec3(-1.0f, +0.0f, +0.0f),        // Normal
 		glm::vec2(+1.0f, +1.0f),               // UV
 
 		
 		// Back
 		glm::vec3(+1.0f, +1.0f, +1.0f),        // 16
-		glm::vec4(+0.6f, +1.0f, +0.7f, +1.0f), // Color
 		glm::vec3(+0.0f, +0.0f, +1.0f),        // Normal
 		glm::vec2(+1.0f, +0.0f),               // UV
 
 		glm::vec3(-1.0f, +1.0f, +1.0f),        // 17
-		glm::vec4(+0.6f, +0.4f, +0.8f, +1.0f), // Color
 		glm::vec3(+0.0f, +0.0f, +1.0f),        // Normal
 		glm::vec2(+0.0f, +0.0f),               // UV
 
 		glm::vec3(-1.0f, -1.0f, +1.0f),        // 18
-		glm::vec4(+0.2f, +0.8f, +0.7f, +1.0f), // Color
 		glm::vec3(+0.0f, +0.0f, +1.0f),        // Normal
 		glm::vec2(+0.0f, +1.0f),               // UV
 
 		glm::vec3(+1.0f, -1.0f, +1.0f),        // 19
-		glm::vec4(+0.2f, +0.7f, +1.0f, +1.0f), // Color
 		glm::vec3(+0.0f, +0.0f, +1.0f),        // Normal
 		glm::vec2(+1.0f, +1.0f),               // UV
 
 		
 										  // Bottom
 		glm::vec3(+1.0f, -1.0f, -1.0f),        // 20
-		glm::vec4(+0.8f, +0.3f, +0.7f, +1.0f), // Color
 		glm::vec3(+0.0f, -1.0f, +0.0f),        // Normal
 		glm::vec2(+1.0f, +1.0f),               // UV
 
 		glm::vec3(-1.0f, -1.0f, -1.0f),        // 21
-		glm::vec4(+0.8f, +0.9f, +0.5f, +1.0f), // Color
 		glm::vec3(+0.0f, -1.0f, +0.0f),        // Normal
 		glm::vec2(+0.0f, +1.0f),               // UV
 
 		glm::vec3(-1.0f, -1.0f, +1.0f),        // 22
-		glm::vec4(+0.5f, +0.8f, +0.5f, +1.0f), // Color
 		glm::vec3(+0.0f, -1.0f, +0.0f),        // Normal
 		glm::vec2(+0.0f, +0.0f),               // UV
 
 		glm::vec3(+1.0f, -1.0f, +1.0f),        // 23
-		glm::vec4(+0.9f, +1.0f, +0.2f, +1.0f), // Color
 		glm::vec3(+0.0f, -1.0f, +0.0f),        // Normal
 		glm::vec2(+1.0f, +0.0f),               // UV
 
@@ -176,22 +152,18 @@ ShapeData ShapeGenerator::makefillerQuard()
 	Vertex verts[] =
 	{	//Main sahpe
 		glm::vec3(+1.0f, +1.0f, +0.0f),			// position
-		glm::vec4(+1.0f, +0.0f, +0.0f, +0.0f),	// color
 		glm::vec3(+0.0f, +0.0f, +1.0f),			// normal
 		glm::vec2(+1.0f, +1.0f),					// uv
 
 		glm::vec3(+1.0f, -1.0f, +0.0f),			// position
-		glm::vec4(+0.0f, +1.0f, +0.0f, +0.0f),	// color
 		glm::vec3(+0.0f, +0.0f, +1.0f),			// normal
 		glm::vec2(+1.0f, +0.0f),					// uv
 
 		glm::vec3(-1.0f, +1.0f, +0.0f),			// position
-		glm::vec4(+0.0f, +0.0f, +1.0f, +0.0f),	// color
 		glm::vec3(+0.0f, +0.0f, +1.0f),			// normal
 		glm::vec2(+0.0f, +1.0f),					// uv
 
 		glm::vec3(-1.0f, -1.0f, +0.0f),			// position
-		glm::vec4(+0.0f, +0.0f, +1.0f, +0.0f),	// color
 		glm::vec3(+0.0f, +0.0f, +1.0f),			// normal
 		glm::vec2(+0.0f, +0.0f),					// uv
 	};

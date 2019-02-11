@@ -11,7 +11,7 @@
 using namespace std;
 using namespace glm;
 const uint NUM_VERTICES_PER_TRU = 3;
-const uint NUM_FLOATS_PER_VERTICE = 9;
+const uint NUM_FLOATS_PER_VERTICE = 8;
 const uint VERTEX_BYTE_SIZE = NUM_FLOATS_PER_VERTICE * sizeof(float);
 
 GLuint PassThroughProgramID;
@@ -20,6 +20,9 @@ GLuint cubeVertexBufferID;
 GLuint cubeIndexBufferID;
 GLuint cubeVertexArrayObjectID;
 GLuint cubeIndices;
+
+GLuint framebuffer;
+GLuint framebufferTexture;
 
 GLuint teapotVertexBufferID;
 GLuint teapotIndexBufferID;
@@ -59,18 +62,18 @@ void GLDisplayWidget::paintGL() {
 	//float newGreenColor = ((int)time) % 20;
 	//float newBlueColor = ((int)time) % 20;
 	//printf("color is %f", newRedColor);
-	glClearColor(0.0, 0.0, 0.0, 1.0);
+	glClearColor(0.05, 0.3, 0.05, 1.0);
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 	glViewport(0, 0, width(), height());
 	glUseProgram(PassThroughProgramID);
 
 	glm::mat4 projectionMatrix = glm::perspective(60.0f, ((float)width()) / height(), 0.01f, 50.0f); // Projection matrix
-	modelTransformMatrix = glm::translate(mat4(), glm::vec3((BBoxMax.x+BBoxMin.x)/2.0f * 0.2f, (BBoxMax.y+BBoxMin.y)/2.0f * 0.2f, (BBoxMax.z + BBoxMin.z)/2.0f * 0.2f)); // Because I scale by 0.2, I need to cut my BBOX by 0.2
+	//modelTransformMatrix = glm::translate(mat4(), glm::vec3((BBoxMax.x+BBoxMin.x)/2.0f * 0.2f, (BBoxMax.y+BBoxMin.y)/2.0f * 0.2f, (BBoxMax.z + BBoxMin.z)/2.0f * 0.2f)); // Because I scale by 0.2, I need to cut my BBOX by 0.2
 	//modelTransformMatrix = glm::translate(mat4(), glm::vec3(0.0f, 0.0f, (BBoxMax.z + BBoxMin.z) / 2.0f * 0.2f)); // Because I scale by 0.2, I need to cut my BBOX by 0.2
-	//modelTransformMatrix = glm::translate(mat4(), glm::vec3(0.0f,0.0f,0.0f)); // Because I scale by 0.2, I need to cut my BBOX by 0.2
+	modelTransformMatrix = glm::translate(mat4(), glm::vec3(0.0f,0.0f,0.0f)); // Because I scale by 0.2, I need to cut my BBOX by 0.2
 	printf("Offset is %f in X, %f in Y, %f in z \n", (BBoxMax.x + BBoxMin.x) / 2.0f * 0.2f, (BBoxMax.y + BBoxMin.y) / 2.0f * 0.2f, (BBoxMax.z + BBoxMin.z) / 2.0f * 0.2f);
-	modelRotateMatrix = glm::rotate(mat4(), -90.0f, glm::vec3(1.0f, 0.0f, 0.0f));
-	modelScaleMatrix = glm::scale(mat4(), glm::vec3(0.2f,0.2f,0.2f));
+	modelRotateMatrix = glm::rotate(mat4(), 0.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+	modelScaleMatrix = glm::scale(mat4(), glm::vec3(2.0f,2.0f,2.0f));
 
 	mat4 ModelToWorldMatrix = modelTransformMatrix * modelRotateMatrix *  modelScaleMatrix;
 	mat4 ModelToViewMatrix = meCamera->getWorldToViewMatrix() * ModelToWorldMatrix;
@@ -93,8 +96,8 @@ void GLDisplayWidget::paintGL() {
 	glUniform1i(diffuseMapUniformLocation, 0);
 	GLuint speculareMapUniformLocation = glGetUniformLocation(PassThroughProgramID, "specularTexture");
 	glUniform1i(speculareMapUniformLocation, 1);
-	glBindVertexArray(teapotVertexArrayObjectID);
-	glDrawElements(GL_TRIANGLES, teapotIndices, GL_UNSIGNED_INT, 0);
+	glBindVertexArray(cubeVertexArrayObjectID);
+	glDrawElements(GL_TRIANGLES, cubeIndices, GL_UNSIGNED_SHORT, 0);
 }
 
 void GLDisplayWidget::initializeGL() {
@@ -128,8 +131,37 @@ void GLDisplayWidget::mouseReleaseEvent(QMouseEvent * event)
 	event->ignore();
 }
 
+void GLDisplayWidget::setupFrameBuffer()
+{
+	glGenFramebuffers(1, &framebuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+
+	//To make framebuffer render to a texture I need to generate a texture object first
+
+
+	glGenTextures(1, &framebufferTexture);
+	//glActiveTexture(GL_TEXTURE5); // Use texture unit 5
+	glBindTexture(GL_TEXTURE_2D, framebufferTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1024, 1024, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glBindTexture(GL_TEXTURE_2D, 0); //bind back to default
+
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, framebufferTexture, 0);
+	// use render Buffer object for depth test
+	unsigned int renderBufferObject;
+	glGenRenderbuffers(1, &renderBufferObject);
+	glBindRenderbuffer(GL_RENDERBUFFER, renderBufferObject);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 1024, 1024);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, renderBufferObject);
+
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
 void GLDisplayWidget::sendDataToOpenGL() {
-	ShapeData shape = ShapeGenerator::makeCube();
+	ShapeData shape = ShapeGenerator::makefillerQuard();
 
 	glGenBuffers(1, &cubeVertexBufferID);
 	glBindBuffer(GL_ARRAY_BUFFER, cubeVertexBufferID);
@@ -219,6 +251,7 @@ void GLDisplayWidget::sendDataToOpenGL() {
 		teapotUVs[teapot.F(i).v[1]] = teapot.VT(teapot.FT(i).v[1]);
 		teapotUVs[teapot.F(i).v[2]] = teapot.VT(teapot.FT(i).v[2]);
 	}
+
 	std::vector<cyPoint3f> teapotInfos;
 	teapotInfos.insert(teapotInfos.end(), teapotVertices.begin(), teapotVertices.end());
 	teapotInfos.insert(teapotInfos.end(), teapotNormals.begin(), teapotNormals.end());
