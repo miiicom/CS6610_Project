@@ -8,5 +8,5 @@ uniform sampler2D frameBufferTexture;
 
 void main()
 {
-	FragmentColor = vec4(texture(frameBufferTexture, fragmentUV0), 1.0);
+	FragmentColor = vec4(vec3(texture(frameBufferTexture, fragmentUV)), 1.0);
 }

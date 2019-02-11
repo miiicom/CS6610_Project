@@ -15,11 +15,17 @@ const uint NUM_FLOATS_PER_VERTICE = 8;
 const uint VERTEX_BYTE_SIZE = NUM_FLOATS_PER_VERTICE * sizeof(float);
 
 GLuint PassThroughProgramID;
+GLuint PostProcessingProgramID;
 
 GLuint cubeVertexBufferID;
 GLuint cubeIndexBufferID;
 GLuint cubeVertexArrayObjectID;
 GLuint cubeIndices;
+
+GLuint planeVertexBufferID;
+GLuint planeIndexBufferID;
+GLuint planeVertexArrayObjectID;
+GLuint planeIndices;
 
 GLuint framebuffer;
 GLuint framebufferTexture;
@@ -72,8 +78,8 @@ void GLDisplayWidget::paintGL() {
 	//modelTransformMatrix = glm::translate(mat4(), glm::vec3(0.0f, 0.0f, (BBoxMax.z + BBoxMin.z) / 2.0f * 0.2f)); // Because I scale by 0.2, I need to cut my BBOX by 0.2
 	modelTransformMatrix = glm::translate(mat4(), glm::vec3(0.0f,0.0f,0.0f)); // Because I scale by 0.2, I need to cut my BBOX by 0.2
 	printf("Offset is %f in X, %f in Y, %f in z \n", (BBoxMax.x + BBoxMin.x) / 2.0f * 0.2f, (BBoxMax.y + BBoxMin.y) / 2.0f * 0.2f, (BBoxMax.z + BBoxMin.z) / 2.0f * 0.2f);
-	modelRotateMatrix = glm::rotate(mat4(), 0.0f, glm::vec3(1.0f, 0.0f, 0.0f));
-	modelScaleMatrix = glm::scale(mat4(), glm::vec3(2.0f,2.0f,2.0f));
+	modelRotateMatrix = glm::rotate(mat4(), 90.0f, glm::vec3(-1.0f, 0.0f, 0.0f));
+	modelScaleMatrix = glm::scale(mat4(), glm::vec3(0.2f,0.2f,0.2f));
 
 	mat4 ModelToWorldMatrix = modelTransformMatrix * modelRotateMatrix *  modelScaleMatrix;
 	mat4 ModelToViewMatrix = meCamera->getWorldToViewMatrix() * ModelToWorldMatrix;
@@ -96,8 +102,11 @@ void GLDisplayWidget::paintGL() {
 	glUniform1i(diffuseMapUniformLocation, 0);
 	GLuint speculareMapUniformLocation = glGetUniformLocation(PassThroughProgramID, "specularTexture");
 	glUniform1i(speculareMapUniformLocation, 1);
-	glBindVertexArray(cubeVertexArrayObjectID);
-	glDrawElements(GL_TRIANGLES, cubeIndices, GL_UNSIGNED_SHORT, 0);
+	glBindVertexArray(teapotVertexArrayObjectID);
+	glDrawElements(GL_TRIANGLES, teapotIndices, GL_UNSIGNED_INT, 0);
+
+	/*glBindVertexArray(planeVertexArrayObjectID);
+	glDrawElements(GL_TRIANGLES, planeIndices, GL_UNSIGNED_SHORT, 0);*/ // For display plane only
 }
 
 void GLDisplayWidget::initializeGL() {
@@ -105,6 +114,7 @@ void GLDisplayWidget::initializeGL() {
 	glEnable(GL_DEPTH_TEST);
 	sendDataToOpenGL();
 	setupVertexArrays();
+	setupFrameBuffer();
 	installShaders();
 }
 
@@ -140,7 +150,7 @@ void GLDisplayWidget::setupFrameBuffer()
 
 
 	glGenTextures(1, &framebufferTexture);
-	//glActiveTexture(GL_TEXTURE5); // Use texture unit 5
+	glActiveTexture(GL_TEXTURE2); // Use texture unit 2
 	glBindTexture(GL_TEXTURE_2D, framebufferTexture);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1024, 1024, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -158,19 +168,20 @@ void GLDisplayWidget::setupFrameBuffer()
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glActiveTexture(GL_TEXTURE0); // Bind back to default slot
 }
 
 void GLDisplayWidget::sendDataToOpenGL() {
 	ShapeData shape = ShapeGenerator::makefillerQuard();
 
-	glGenBuffers(1, &cubeVertexBufferID);
-	glBindBuffer(GL_ARRAY_BUFFER, cubeVertexBufferID);
+	glGenBuffers(1, &planeVertexBufferID);
+	glBindBuffer(GL_ARRAY_BUFFER, planeVertexBufferID);
 	glBufferData(GL_ARRAY_BUFFER, shape.vertexBufferSize(), shape.vertices, GL_STATIC_DRAW);
 
-	glGenBuffers(1, &cubeIndexBufferID);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeIndexBufferID);
+	glGenBuffers(1, &planeIndexBufferID);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, planeIndexBufferID);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, shape.indexBufferSize(), shape.indices, GL_STATIC_DRAW);
-	cubeIndices = shape.numIndices;
+	planeIndices = shape.numIndices;
 	shape.cleanup();
 
 	std::ostream *outStream = &std::cout;
@@ -282,17 +293,17 @@ void GLDisplayWidget::sendDataToOpenGL() {
 
 void GLDisplayWidget::setupVertexArrays()
 {
-	glGenVertexArrays(1, &cubeVertexArrayObjectID);
+	glGenVertexArrays(1, &planeVertexArrayObjectID);
 
-	glBindVertexArray(cubeVertexArrayObjectID);
+	glBindVertexArray(planeVertexArrayObjectID);
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
-	glBindBuffer(GL_ARRAY_BUFFER, cubeVertexBufferID);
+	glBindBuffer(GL_ARRAY_BUFFER, planeVertexBufferID);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * NUM_FLOATS_PER_VERTICE, 0);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * NUM_FLOATS_PER_VERTICE, (char*)(sizeof(float) * 3));
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * NUM_FLOATS_PER_VERTICE, (void*)(sizeof(float) * 6));
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeIndexBufferID);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, planeIndexBufferID);
 
 	glGenVertexArrays(1, &teapotVertexArrayObjectID);
 
@@ -361,6 +372,8 @@ void GLDisplayWidget::installShaders() {
 
 	GLuint  vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
 	GLuint  fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
+	GLuint  PPvertexShaderID = glCreateShader(GL_VERTEX_SHADER);
+	GLuint  PPfragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
 
 	string temp = readShaderCode("shaders/passThroughVertexShader.glsl");
 	const GLchar* adapter[1];
@@ -372,11 +385,24 @@ void GLDisplayWidget::installShaders() {
 	adapter[0] = temp.c_str();
 	glShaderSource(fragmentShaderID, 1, adapter, 0);
 
+	temp = readShaderCode("shaders/PostProcessingVertexShader.glsl");
+	adapter[0] = temp.c_str();
+	glShaderSource(PPvertexShaderID, 1, adapter, 0);
+
+	temp = readShaderCode("shaders/PostProcessingFragmentShader.glsl");
+	adapter[0] = temp.c_str();
+	glShaderSource(PPfragmentShaderID, 1, adapter, 0);
+
 	glCompileShader(vertexShaderID);
 	glCompileShader(fragmentShaderID);
+	glCompileShader(PPvertexShaderID);
+	glCompileShader(PPfragmentShaderID);
 
 	if (!checkShaderStatus(vertexShaderID)
-		|| !checkShaderStatus(fragmentShaderID)) {
+		|| !checkShaderStatus(fragmentShaderID)
+		|| !checkShaderStatus(PPvertexShaderID)
+		|| !checkShaderStatus(PPfragmentShaderID)
+		) {
 		return;
 	}
 
@@ -385,7 +411,12 @@ void GLDisplayWidget::installShaders() {
 	glAttachShader(PassThroughProgramID, fragmentShaderID);
 	glLinkProgram(PassThroughProgramID);
 
-	if (!checkProgramStatus(PassThroughProgramID)) {
+	PostProcessingProgramID = glCreateProgram();
+	glAttachShader(PostProcessingProgramID, PPvertexShaderID);
+	glAttachShader(PostProcessingProgramID, PPfragmentShaderID);
+	glLinkProgram(PostProcessingProgramID);
+
+	if (!checkProgramStatus(PassThroughProgramID) || !checkProgramStatus(PostProcessingProgramID)) {
 		return;
 	}
 }
