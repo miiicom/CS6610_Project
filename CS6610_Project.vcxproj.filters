@@ -22,6 +22,12 @@
     <None Include="shaders\passThroughVertexShader.glsl">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="shaders\PostProcessingVertexShader.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\PostProcessingFragmentShader.glsl">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Shaders">

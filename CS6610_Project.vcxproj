@@ -139,6 +139,8 @@
   <ItemGroup>
     <None Include="shaders\passThroughFragmentShader.glsl" />
     <None Include="shaders\passThroughVertexShader.glsl" />
+    <None Include="shaders\PostProcessingFragmentShader.glsl" />
+    <None Include="shaders\PostProcessingVertexShader.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Object Include="objs\teapot.obj">

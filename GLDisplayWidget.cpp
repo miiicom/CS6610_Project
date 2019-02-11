@@ -215,9 +215,9 @@ void GLDisplayWidget::sendDataToOpenGL() {
 	std::vector<cyPoint3f> teapotUVs;
 	teapotUVs.resize(teapot.NV());
 	for (int i = 0; i < teapot.NF(); i++) {
-		teapotUVs[teapot.FT(i).v[0]] = teapot.VT(teapot.FT(i).v[0]);
-		teapotUVs[teapot.FT(i).v[1]] = teapot.VT(teapot.FT(i).v[1]);
-		teapotUVs[teapot.FT(i).v[2]] = teapot.VT(teapot.FT(i).v[2]);
+		teapotUVs[teapot.F(i).v[0]] = teapot.VT(teapot.FT(i).v[0]);
+		teapotUVs[teapot.F(i).v[1]] = teapot.VT(teapot.FT(i).v[1]);
+		teapotUVs[teapot.F(i).v[2]] = teapot.VT(teapot.FT(i).v[2]);
 	}
 	std::vector<cyPoint3f> teapotInfos;
 	teapotInfos.insert(teapotInfos.end(), teapotVertices.begin(), teapotVertices.end());
