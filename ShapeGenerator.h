@@ -5,6 +5,7 @@ class ShapeGenerator
 {
 public:
 	static ShapeData makeCube();
+	static ShapeData makefillerQuard();
 	static ShapeData readObj(const char* path);
 	ShapeGenerator();
 	~ShapeGenerator();
