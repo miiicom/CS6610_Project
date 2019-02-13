@@ -63,14 +63,14 @@ void GLDisplayWidget::ClockTick()
 }
 
 void GLDisplayWidget::paintGL() {
-	//Clean buffer before draw
-	//float newRedColor = ((int)time) % 10;
-	//float newGreenColor = ((int)time) % 20;
-	//float newBlueColor = ((int)time) % 20;
-	//printf("color is %f", newRedColor);
+
+	//In here render to my new frame Buffer 
+	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+
 	glClearColor(0.05, 0.3, 0.05, 1.0);
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 	glViewport(0, 0, width(), height());
+	glEnable(GL_DEPTH_TEST);
 	glUseProgram(PassThroughProgramID);
 
 	glm::mat4 projectionMatrix = glm::perspective(60.0f, ((float)width()) / height(), 0.01f, 50.0f); // Projection matrix
@@ -78,7 +78,7 @@ void GLDisplayWidget::paintGL() {
 	//modelTransformMatrix = glm::translate(mat4(), glm::vec3(0.0f, 0.0f, (BBoxMax.z + BBoxMin.z) / 2.0f * 0.2f)); // Because I scale by 0.2, I need to cut my BBOX by 0.2
 	modelTransformMatrix = glm::translate(mat4(), glm::vec3(0.0f,0.0f,0.0f)); // Because I scale by 0.2, I need to cut my BBOX by 0.2
 	printf("Offset is %f in X, %f in Y, %f in z \n", (BBoxMax.x + BBoxMin.x) / 2.0f * 0.2f, (BBoxMax.y + BBoxMin.y) / 2.0f * 0.2f, (BBoxMax.z + BBoxMin.z) / 2.0f * 0.2f);
-	modelRotateMatrix = glm::rotate(mat4(), 90.0f, glm::vec3(-1.0f, 0.0f, 0.0f));
+	modelRotateMatrix = glm::rotate(mat4(), 0.0f, glm::vec3(-1.0f, 0.0f, 0.0f));
 	modelScaleMatrix = glm::scale(mat4(), glm::vec3(0.2f,0.2f,0.2f));
 
 	mat4 ModelToWorldMatrix = modelTransformMatrix * modelRotateMatrix *  modelScaleMatrix;
@@ -104,6 +104,34 @@ void GLDisplayWidget::paintGL() {
 	glUniform1i(speculareMapUniformLocation, 1);
 	glBindVertexArray(teapotVertexArrayObjectID);
 	glDrawElements(GL_TRIANGLES, teapotIndices, GL_UNSIGNED_INT, 0);
+
+	//Finish rendering to frame Buffer
+	//Now use a simple plane to display the texture
+	glViewport(0, 0, width(), height());
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glDisable(GL_DEPTH_TEST);
+	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
+	glUseProgram(PostProcessingProgramID);
+
+	modelTransformMatrix = glm::translate(mat4(), glm::vec3(0.0f, 0.0f, 0.0f)); // Because I scale by 0.2, I need to cut my BBOX by 0.2
+	printf("Offset is %f in X, %f in Y, %f in z \n", (BBoxMax.x + BBoxMin.x) / 2.0f * 0.2f, (BBoxMax.y + BBoxMin.y) / 2.0f * 0.2f, (BBoxMax.z + BBoxMin.z) / 2.0f * 0.2f);
+	modelRotateMatrix = glm::rotate(mat4(), 0.0f, glm::vec3(-1.0f, 0.0f, 0.0f));
+	modelScaleMatrix = glm::scale(mat4(), glm::vec3(2.0f,2.0f, 2.0f));
+
+	ModelToWorldMatrix = modelTransformMatrix * modelRotateMatrix *  modelScaleMatrix;
+	ModelToViewMatrix = meCamera->getWorldToViewMatrix() * ModelToWorldMatrix;
+	fullTransformMatrix = projectionMatrix * ModelToViewMatrix;
+
+	glBindVertexArray(planeVertexArrayObjectID);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, framebufferTexture);
+	GLuint framebufferTextureUniformLoc = glGetUniformLocation(PostProcessingProgramID, "frameBufferTexture");
+	glUniform1i(framebufferTextureUniformLoc,2);
+	fullTransformMatrixUniformLocation = glGetUniformLocation(PostProcessingProgramID, "modelToProjectionMatrix");
+	glUniformMatrix4fv(fullTransformMatrixUniformLocation, 1, GL_FALSE, &fullTransformMatrix[0][0]);
+
+	glDrawElements(GL_TRIANGLES, planeIndices, GL_UNSIGNED_SHORT, 0);
 
 	/*glBindVertexArray(planeVertexArrayObjectID);
 	glDrawElements(GL_TRIANGLES, planeIndices, GL_UNSIGNED_SHORT, 0);*/ // For display plane only
@@ -168,7 +196,7 @@ void GLDisplayWidget::setupFrameBuffer()
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glActiveTexture(GL_TEXTURE0); // Bind back to default slot
+	//glActiveTexture(GL_TEXTURE0); // Bind back to default slot
 }
 
 void GLDisplayWidget::sendDataToOpenGL() {
