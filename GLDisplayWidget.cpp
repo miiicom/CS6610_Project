@@ -78,7 +78,7 @@ void GLDisplayWidget::paintGL() {
 	//modelTransformMatrix = glm::translate(mat4(), glm::vec3(0.0f, 0.0f, (BBoxMax.z + BBoxMin.z) / 2.0f * 0.2f)); // Because I scale by 0.2, I need to cut my BBOX by 0.2
 	modelTransformMatrix = glm::translate(mat4(), glm::vec3(0.0f,0.0f,0.0f)); // Because I scale by 0.2, I need to cut my BBOX by 0.2
 	printf("Offset is %f in X, %f in Y, %f in z \n", (BBoxMax.x + BBoxMin.x) / 2.0f * 0.2f, (BBoxMax.y + BBoxMin.y) / 2.0f * 0.2f, (BBoxMax.z + BBoxMin.z) / 2.0f * 0.2f);
-	modelRotateMatrix = glm::rotate(mat4(), 0.0f, glm::vec3(-1.0f, 0.0f, 0.0f));
+	modelRotateMatrix = glm::rotate(mat4(), 90.0f, glm::vec3(-1.0f, 0.0f, 0.0f));
 	modelScaleMatrix = glm::scale(mat4(), glm::vec3(0.2f,0.2f,0.2f));
 
 	mat4 ModelToWorldMatrix = modelTransformMatrix * modelRotateMatrix *  modelScaleMatrix;
@@ -110,14 +110,14 @@ void GLDisplayWidget::paintGL() {
 	glViewport(0, 0, width(), height());
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glDisable(GL_DEPTH_TEST);
-	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 	glUseProgram(PostProcessingProgramID);
 
 	modelTransformMatrix = glm::translate(mat4(), glm::vec3(0.0f, 0.0f, 0.0f)); // Because I scale by 0.2, I need to cut my BBOX by 0.2
 	printf("Offset is %f in X, %f in Y, %f in z \n", (BBoxMax.x + BBoxMin.x) / 2.0f * 0.2f, (BBoxMax.y + BBoxMin.y) / 2.0f * 0.2f, (BBoxMax.z + BBoxMin.z) / 2.0f * 0.2f);
-	modelRotateMatrix = glm::rotate(mat4(), 0.0f, glm::vec3(-1.0f, 0.0f, 0.0f));
-	modelScaleMatrix = glm::scale(mat4(), glm::vec3(2.0f,2.0f, 2.0f));
+	modelRotateMatrix = glm::rotate(mat4(), 30.0f, glm::vec3(-1.0f, 0.0f, 0.0f));
+	modelScaleMatrix = glm::scale(mat4(), glm::vec3(3.0f,3.0f, 3.0f));
 
 	ModelToWorldMatrix = modelTransformMatrix * modelRotateMatrix *  modelScaleMatrix;
 	ModelToViewMatrix = meCamera->getWorldToViewMatrix() * ModelToWorldMatrix;
