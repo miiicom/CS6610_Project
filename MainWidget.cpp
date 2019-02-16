@@ -81,6 +81,12 @@ void MainWidget::keyPressEvent(QKeyEvent *event)
 		printf("ctrl pressed");
 		IsCtrlPressing = true;
 	}
+
+	if (event->key() == Qt::Key_Alt)
+	{
+		printf("Alt pressed");
+		IsAltPressing = true;
+	}
 	
 }
 
@@ -90,6 +96,12 @@ void MainWidget::keyReleaseEvent(QKeyEvent *event)
 	{
 		printf("ctrl pressed");
 		IsCtrlPressing = false;
+	}
+
+	if (event->key() == Qt::Key_Alt)
+	{
+		printf("Alt pressed");
+		IsAltPressing = false;
 	}
 }
 
@@ -128,32 +140,43 @@ void MainWidget::mouseMoveEvent(QMouseEvent * event)
 	dragStartPosition = event->pos();
 	if (event->buttons() & Qt::LeftButton) {
 		if (IsCtrlPressing) {
-			displayWidget->setPointLightPosition(xMovement, yMovement);
+			displayWidget->setPointLightPosition(xMovement, yMovement); //Change light Position
 			displayWidget->repaint();
 		}
-		else{
+		if (IsAltPressing){ //Do this to meCamera
 			displayWidget->meCamera->mouseUpdate(glm::vec2(xMovement, yMovement));
+			printf("Dragging in main Widget\n");
+			displayWidget->repaint();
+		} 
+		else{ //Do to render camera
+			displayWidget->RenderCamera->mouseUpdate(glm::vec2(xMovement, yMovement));
 			printf("Dragging in main Widget\n");
 			displayWidget->repaint();
 		}
 	}
 
-	//if (event->buttons() & Qt::RightButton) {
-	//	if ((event->pos() - dragStartPosition).manhattanLength()
-	//		< QApplication::startDragDistance())
-	//		return;
-	//	float xMovement = event->pos().x() - dragStartPosition.x();
-	//	float yMovement = event->pos().y() - dragStartPosition.y();
+	if (event->buttons() & Qt::RightButton) {
+		printf("Right clciked\n");
 
-	//	dragStartPosition = event->pos();
-	//	if (yMovement >= 0.0) {
-	//		displayWidget->meCamera->moveForward();
-	//	}
-	//	else {
-	//		displayWidget->meCamera->moveBackward();
-	//	}
-	//	printf("Dragging in main Widget\n");
-	//	displayWidget->repaint();
-	//}
+		dragStartPosition = event->pos();
+		if (IsAltPressing) {
+			if (yMovement >= 0.0) {
+				displayWidget->meCamera->moveForward();
+			}
+			else {
+				displayWidget->meCamera->moveBackward();
+			}
+		}
+		else {
+			if (yMovement >= 0.0) {
+				displayWidget->RenderCamera->moveForward();
+			}
+			else {
+				displayWidget->RenderCamera->moveBackward();
+			}
+		}
+		printf("Dragging in main Widget\n");
+		displayWidget->repaint();
+	}
 
 }

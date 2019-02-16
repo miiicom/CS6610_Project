@@ -45,6 +45,7 @@ GLDisplayWidget::GLDisplayWidget()
 
 	time = 0.0;
 	meCamera = new MeCamera;
+	RenderCamera = new MeCamera;
 	ReadObjName = "objs/teapot.obj";// default one
 	printf("read obj is %s", ReadObjName);
 
@@ -120,7 +121,7 @@ void GLDisplayWidget::paintGL() {
 	modelScaleMatrix = glm::scale(mat4(), glm::vec3(3.0f,3.0f, 3.0f));
 
 	ModelToWorldMatrix = modelTransformMatrix * modelRotateMatrix *  modelScaleMatrix;
-	ModelToViewMatrix = meCamera->getWorldToViewMatrix() * ModelToWorldMatrix;
+	ModelToViewMatrix = RenderCamera->getWorldToViewMatrix() * ModelToWorldMatrix;
 	fullTransformMatrix = projectionMatrix * ModelToViewMatrix;
 
 	glBindVertexArray(planeVertexArrayObjectID);

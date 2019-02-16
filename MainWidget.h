@@ -20,4 +20,5 @@ private:
 	GLDisplayWidget * displayWidget;
 	QPoint dragStartPosition;
 	bool IsCtrlPressing;
+	bool IsAltPressing;
 };

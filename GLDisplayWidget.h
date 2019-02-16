@@ -18,6 +18,7 @@ public:
 	void installShaders();
 	void setPointLightPosition(float Xmovement, float Ymovement);
 	MeCamera * meCamera;
+	MeCamera * RenderCamera;
 	const char* ReadObjName;
 protected:
 	void paintGL();
