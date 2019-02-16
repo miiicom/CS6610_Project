@@ -16,5 +16,5 @@ void main()
 	gl_Position = modelToProjectionMatrix * vertexPositionModel;
 	NormalWorld = vec3(modelToWorldTransMatrix * vec4(vertexNormalModel,0));
 	VertexPositionWorld = vec3(modelToWorldTransMatrix * vertexPositionModel);
-	fragmentUV = vec2(vertexUVModel.x,-vertexUVModel.y);
+	fragmentUV = vec2(vertexUVModel.x,vertexUVModel.y);
 }
