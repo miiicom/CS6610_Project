@@ -204,7 +204,7 @@ void GLDisplayWidget::sendDataToOpenGL() {
 
 	std::vector<cyPoint3f> teapotNormals;
 	for (int i = 0; i < teapot.NV(); i++) {
-		teapotVertices.push_back(teapot.VN(i));
+		teapotNormals.push_back(teapot.VN(i));
 	}
 
 	//std::vector<cyPoint3f> teapotUVs;
