@@ -215,9 +215,10 @@ void GLDisplayWidget::sendDataToOpenGL() {
 	std::vector<cyPoint3f> teapotUVs;
 	teapotUVs.resize(teapot.NV());
 	for (int i = 0; i < teapot.NF(); i++) {
-		teapotUVs[teapot.FT(i).v[0]] = teapot.VT(teapot.FT(i).v[0]);
-		teapotUVs[teapot.FT(i).v[1]] = teapot.VT(teapot.FT(i).v[1]);
-		teapotUVs[teapot.FT(i).v[2]] = teapot.VT(teapot.FT(i).v[2]);
+		for (int j = 0; j < 3; j++) {
+			teapotUVs[teapot.F(i).v[j]] = cyPoint3f(teapot.VT(teapot.FT(i).v[j]).x, 
+				teapot.VT(teapot.FT(i).v[j]).y, 0);
+		}
 	}
 	std::vector<cyPoint3f> teapotInfos;
 	teapotInfos.insert(teapotInfos.end(), teapotVertices.begin(), teapotVertices.end());
@@ -237,7 +238,7 @@ void GLDisplayWidget::sendDataToOpenGL() {
 	// read vertex position info only
 	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, teapot.NF() * sizeof(unsigned int) *3 , &teapot.F(0), GL_STATIC_DRAW);
 	// read vertex information from a vector
-	glBufferData(GL_ARRAY_BUFFER, (teapot.NV() + teapot.NVN() + teapot.NV())* sizeof(cyPoint3f), &teapotVertices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, (teapot.NV() + teapot.NVN() + teapot.NV())* sizeof(cyPoint3f), &teapotInfos[0], GL_STATIC_DRAW);
 	
 
 	glGenBuffers(1, &teapotIndexBufferID);
@@ -270,7 +271,7 @@ void GLDisplayWidget::setupVertexArrays()
 	glBindBuffer(GL_ARRAY_BUFFER, teapotVertexBufferID);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)(sizeof(cyPoint3f) * teapot.NV()));
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE,0, (void*)(sizeof(cyPoint3f) *  teapot.NVN()));
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE,0, (void*)(sizeof(cyPoint3f) *  teapot.NVN() + sizeof(cyPoint3f) * teapot.NV()));
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, teapotIndexBufferID);
 }
 //--------------Shader utility functions
