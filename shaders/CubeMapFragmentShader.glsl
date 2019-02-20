@@ -27,8 +27,6 @@ void main()
 	else{
 		vec3 ViewDirectionWorld = normalize(cameraPositionWorld - VertexPositionWorld);
 		ReflectDir = reflect(-ViewDirectionWorld, normalize(NormalWorld));
-		//ReflectDir = vec3(ReflectDir.x,ReflectDir.y,ReflectDir.z);
-		//ReflectDir = ViewDirectionWorld;
 	}
 	
 	vec4 cubeMapColor = texture(CubeMapTexture,ReflectDir);

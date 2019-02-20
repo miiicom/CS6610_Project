@@ -114,7 +114,7 @@ void GLDisplayWidget::paintGL() {
 	glEnable(GL_DEPTH_TEST);//Enable this for object
 
 	modelTransformMatrix = glm::translate(mat4(), glm::vec3(0.0f, 0.0f, 0.0f)); // Because I scale by 0.2, I need to cut my BBOX by 0.2
-	modelRotateMatrix = glm::rotate(mat4(), 0.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+	modelRotateMatrix = glm::rotate(mat4(), 90.0f, glm::vec3(1.0f, 0.0f, 0.0f));
 	modelScaleMatrix = glm::scale(mat4(), glm::vec3(0.2f, 0.2f, 0.2f));
 
 	ModelToWorldMatrix = modelTransformMatrix * modelRotateMatrix *  modelScaleMatrix;
@@ -127,6 +127,22 @@ void GLDisplayWidget::paintGL() {
 
 	glBindVertexArray(teapotVertexArrayObjectID);
 	glDrawElements(GL_TRIANGLES, teapotIndices, GL_UNSIGNED_INT, 0);
+
+	//Draw Plane
+	modelTransformMatrix = glm::translate(mat4(), glm::vec3(0.0f, 0.0f, 0.0f)); // Because I scale by 0.2, I need to cut my BBOX by 0.2
+	modelRotateMatrix = glm::rotate(mat4(), 90.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+	modelScaleMatrix = glm::scale(mat4(), glm::vec3(5.0f, 5.0f,5.0f));
+
+	ModelToWorldMatrix = modelTransformMatrix * modelRotateMatrix *  modelScaleMatrix;
+	ModelToViewMatrix = meCamera->getWorldToViewMatrix() * ModelToWorldMatrix;
+	fullTransformMatrix = projectionMatrix * ModelToViewMatrix;
+
+	glUniformMatrix4fv(fullTransformMatrixUniformLocation, 1, GL_FALSE, &fullTransformMatrix[0][0]);
+	glUniformMatrix4fv(modelToWroldMatrixUniformLocation, 1, GL_FALSE, &ModelToWorldMatrix[0][0]);
+	glUniform1i(DrawSkyboxUniformLocation, 0);
+
+	glBindVertexArray(planeVertexArrayObjectID);
+	glDrawElements(GL_TRIANGLES, planeIndices, GL_UNSIGNED_SHORT, 0);
 
 	//Finish rendering to frame Buffer
 	//Now use a simple plane to display the texture

@@ -1,2 +1,8 @@
-﻿  MeCamera.cpp
+﻿  GLDisplayWidget.cpp
+c:\users\u1137972\source\repos\cs6610_project\shapedata.h(4): warning C4099: 'Vertex': type name first seen using 'struct' now seen using 'class'
+  c:\users\u1137972\source\repos\cs6610_project\vertex.h(5): note: see declaration of 'Vertex'
+c:\users\u1137972\source\repos\cs6610_project\gldisplaywidget.cpp(72): warning C4305: 'argument': truncation from 'double' to 'GLclampf'
+c:\users\u1137972\source\repos\cs6610_project\gldisplaywidget.cpp(353): warning C4018: '<': signed/unsigned mismatch
+c:\users\u1137972\source\repos\cs6610_project\gldisplaywidget.cpp(358): warning C4018: '<': signed/unsigned mismatch
+c:\users\u1137972\source\repos\cs6610_project\gldisplaywidget.cpp(369): warning C4018: '<': signed/unsigned mismatch
   CS6610_Project.vcxproj -> C:\Users\U1137972\source\repos\CS6610_Project\Debug\CS6610_Project.exe
