@@ -66,7 +66,7 @@ void GLDisplayWidget::ClockTick()
 void GLDisplayWidget::paintGL() {
 
 	//In here render to my new frame Buffer 
-	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+	//glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 
 	glClearColor(0.05, 0.3, 0.05, 1.0);
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
@@ -108,31 +108,31 @@ void GLDisplayWidget::paintGL() {
 
 	//Finish rendering to frame Buffer
 	//Now use a simple plane to display the texture
-	glViewport(0, 0, width(), height());
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glDisable(GL_DEPTH_TEST);
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
-	glUseProgram(PostProcessingProgramID);
+	//glViewport(0, 0, width(), height());
+	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	//glDisable(GL_DEPTH_TEST);
+	//glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	//glClear(GL_COLOR_BUFFER_BIT);
+	//glUseProgram(PostProcessingProgramID);
 
-	modelTransformMatrix = glm::translate(mat4(), glm::vec3(0.0f, 0.0f, 0.0f)); // Because I scale by 0.2, I need to cut my BBOX by 0.2
-	printf("Offset is %f in X, %f in Y, %f in z \n", (BBoxMax.x + BBoxMin.x) / 2.0f * 0.2f, (BBoxMax.y + BBoxMin.y) / 2.0f * 0.2f, (BBoxMax.z + BBoxMin.z) / 2.0f * 0.2f);
-	modelRotateMatrix = glm::rotate(mat4(), 30.0f, glm::vec3(-1.0f, 0.0f, 0.0f));
-	modelScaleMatrix = glm::scale(mat4(), glm::vec3(3.0f,3.0f, 3.0f));
+	//modelTransformMatrix = glm::translate(mat4(), glm::vec3(0.0f, 0.0f, 0.0f)); // Because I scale by 0.2, I need to cut my BBOX by 0.2
+	//printf("Offset is %f in X, %f in Y, %f in z \n", (BBoxMax.x + BBoxMin.x) / 2.0f * 0.2f, (BBoxMax.y + BBoxMin.y) / 2.0f * 0.2f, (BBoxMax.z + BBoxMin.z) / 2.0f * 0.2f);
+	//modelRotateMatrix = glm::rotate(mat4(), 30.0f, glm::vec3(-1.0f, 0.0f, 0.0f));
+	//modelScaleMatrix = glm::scale(mat4(), glm::vec3(3.0f,3.0f, 3.0f));
 
-	ModelToWorldMatrix = modelTransformMatrix * modelRotateMatrix *  modelScaleMatrix;
-	ModelToViewMatrix = RenderCamera->getWorldToViewMatrix() * ModelToWorldMatrix;
-	fullTransformMatrix = projectionMatrix * ModelToViewMatrix;
+	//ModelToWorldMatrix = modelTransformMatrix * modelRotateMatrix *  modelScaleMatrix;
+	//ModelToViewMatrix = RenderCamera->getWorldToViewMatrix() * ModelToWorldMatrix;
+	//fullTransformMatrix = projectionMatrix * ModelToViewMatrix;
 
-	glBindVertexArray(planeVertexArrayObjectID);
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, framebufferTexture);
-	GLuint framebufferTextureUniformLoc = glGetUniformLocation(PostProcessingProgramID, "frameBufferTexture");
-	glUniform1i(framebufferTextureUniformLoc,2);
-	fullTransformMatrixUniformLocation = glGetUniformLocation(PostProcessingProgramID, "modelToProjectionMatrix");
-	glUniformMatrix4fv(fullTransformMatrixUniformLocation, 1, GL_FALSE, &fullTransformMatrix[0][0]);
+	//glBindVertexArray(planeVertexArrayObjectID);
+	//glActiveTexture(GL_TEXTURE2);
+	//glBindTexture(GL_TEXTURE_2D, framebufferTexture);
+	//GLuint framebufferTextureUniformLoc = glGetUniformLocation(PostProcessingProgramID, "frameBufferTexture");
+	//glUniform1i(framebufferTextureUniformLoc,2);
+	//fullTransformMatrixUniformLocation = glGetUniformLocation(PostProcessingProgramID, "modelToProjectionMatrix");
+	//glUniformMatrix4fv(fullTransformMatrixUniformLocation, 1, GL_FALSE, &fullTransformMatrix[0][0]);
 
-	glDrawElements(GL_TRIANGLES, planeIndices, GL_UNSIGNED_SHORT, 0);
+	//glDrawElements(GL_TRIANGLES, planeIndices, GL_UNSIGNED_SHORT, 0);
 
 	/*glBindVertexArray(planeVertexArrayObjectID);
 	glDrawElements(GL_TRIANGLES, planeIndices, GL_UNSIGNED_SHORT, 0);*/ // For display plane only
@@ -261,6 +261,35 @@ void GLDisplayWidget::sendDataToOpenGL() {
 		GL_LINEAR);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
 		GL_LINEAR);
+
+	//Environment map information
+	glActiveTexture(GL_TEXTURE3); // 3 for cube map color
+	GLuint EnvironmentMapTextureID;
+	glGenTextures(1, &EnvironmentMapTextureID);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, EnvironmentMapTextureID);
+
+	const char * suffixes[] = { "posx", "negx", "posy","negy", "posz", "negz" };
+
+	GLuint targets[] = { GL_TEXTURE_CUBE_MAP_POSITIVE_X,
+		GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
+		GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
+		GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
+		GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
+		GL_TEXTURE_CUBE_MAP_NEGATIVE_Z };
+
+	std::string cubemapName = "Textures/cubemap";
+
+	for (int i = 0; i < 6; i++) {
+		std::string texName = cubemapName + "_" + suffixes[i] + ".png";
+		QImage EnvironmentImg = QGLWidget::convertToGLFormat(QImage(texName.c_str(), "PNG"));
+		glTexImage2D(targets[i], 0, GL_RGBA, EnvironmentImg.width(), EnvironmentImg.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, EnvironmentImg.bits());
+	}
+
+	glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
 
 	teapot.ComputeBoundingBox();
