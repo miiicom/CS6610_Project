@@ -12,10 +12,11 @@ uniform float pointLightIntensity;
 uniform vec3 ambientLightUniform;
 uniform vec3 cameraPositionWorld;
 
-uniform samplerCube CubeMapTexture
+uniform samplerCube CubeMapTexture;
 
 void main()
 {
 	vec4 cubeMapColor = texture(CubeMapTexture,ReflectDir);
 	FragmentColor = cubeMapColor;
+	//FragmentColor = vec4(VertexPositionWorld,1.0);
 }

@@ -28,6 +28,12 @@
     <None Include="shaders\PostProcessingFragmentShader.glsl">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="shaders\CubeMapVertexShader.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\CubeMapFragmentShader.glsl">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Shaders">

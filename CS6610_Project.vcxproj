@@ -137,6 +137,8 @@
     <ClInclude Include="vertex.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shaders\CubeMapFragmentShader.glsl" />
+    <None Include="shaders\CubeMapVertexShader.glsl" />
     <None Include="shaders\passThroughFragmentShader.glsl" />
     <None Include="shaders\passThroughVertexShader.glsl" />
     <None Include="shaders\PostProcessingFragmentShader.glsl" />
