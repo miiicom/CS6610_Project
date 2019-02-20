@@ -72,14 +72,14 @@ void GLDisplayWidget::paintGL() {
 	glClearColor(0.05, 0.3, 0.05, 1.0);
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 	glViewport(0, 0, width(), height());
-	glEnable(GL_DEPTH_TEST);//Disable this for cubemap
+	glDisable(GL_DEPTH_TEST);//Disable this for cubemap
 	glUseProgram(CubeMapProgramID);
 
 	glm::mat4 projectionMatrix = glm::perspective(60.0f, ((float)width()) / height(), 0.01f, 50.0f); // Projection matrix
 	modelTransformMatrix = glm::translate(mat4(), glm::vec3(0.0f,0.0f,0.0f)); // Because I scale by 0.2, I need to cut my BBOX by 0.2
 	printf("Offset is %f in X, %f in Y, %f in z \n", (BBoxMax.x + BBoxMin.x) / 2.0f * 0.2f, (BBoxMax.y + BBoxMin.y) / 2.0f * 0.2f, (BBoxMax.z + BBoxMin.z) / 2.0f * 0.2f);
 	modelRotateMatrix = glm::rotate(mat4(),0.0f, glm::vec3(1.0f, 0.0f, 0.0f));
-	modelScaleMatrix = glm::scale(mat4(), glm::vec3(0.2f,0.2f,0.2f));
+	modelScaleMatrix = glm::scale(mat4(), glm::vec3(20.0f,20.0f,20.0f));
 
 	mat4 ModelToWorldMatrix = modelTransformMatrix * modelRotateMatrix *  modelScaleMatrix;
 	mat4 ModelToViewMatrix = meCamera->getWorldToViewMatrix() * ModelToWorldMatrix;
@@ -106,8 +106,8 @@ void GLDisplayWidget::paintGL() {
 	glUniform1i(cubeMapUniformLocation, 3);
 	GLuint DrawSkyboxUniformLocation = glGetUniformLocation(CubeMapProgramID, "DrawSkyBox");
 	glUniform1i(DrawSkyboxUniformLocation, 1);
-	glBindVertexArray(teapotVertexArrayObjectID);
-	glDrawElements(GL_TRIANGLES, teapotIndices, GL_UNSIGNED_INT, 0);
+	glBindVertexArray(cubeVertexArrayObjectID);
+	glDrawElements(GL_TRIANGLES, cubeIndices, GL_UNSIGNED_SHORT, 0);
 
 	//Finish rendering to frame Buffer
 	//Now use a simple plane to display the texture

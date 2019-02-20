@@ -20,7 +20,7 @@ void main()
 	fragmentUV = vec2(vertexUVModel.x,vertexUVModel.y);
 
 	if(DrawSkyBox){
-		ReflectDir = vec3(vertexPositionModel.x,vertexPositionModel.y,-vertexPositionModel.z);
+		ReflectDir = vec3(vertexPositionModel.x,vertexPositionModel.y,vertexPositionModel.z);
 	}
 	else{
 		VertexPositionWorld = vec3(modelToWorldTransMatrix * vertexPositionModel);
