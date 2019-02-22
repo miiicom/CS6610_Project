@@ -224,9 +224,10 @@ void GLDisplayWidget::paintGL() {
 void GLDisplayWidget::initializeGL() {
 	glewInit();
 	glEnable(GL_DEPTH_TEST);
+	setupFrameBuffer();
 	sendDataToOpenGL();
 	setupVertexArrays();
-	setupFrameBuffer();
+	
 	installShaders();
 }
 
@@ -262,11 +263,12 @@ void GLDisplayWidget::setupFrameBuffer()
 
 
 	glGenTextures(1, &framebufferTexture);
-	glActiveTexture(GL_TEXTURE3); // Use texture unit 2
+	glActiveTexture(GL_TEXTURE3); // Use texture unit 3
 	glBindTexture(GL_TEXTURE_2D, framebufferTexture);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1024, 1024, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glGenerateMipmap(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, 0); //bind back to default
 
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, framebufferTexture, 0);
