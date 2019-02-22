@@ -17,6 +17,7 @@ const uint VERTEX_BYTE_SIZE = NUM_FLOATS_PER_VERTICE * sizeof(float);
 GLuint PassThroughProgramID;
 GLuint PostProcessingProgramID;
 GLuint CubeMapProgramID;
+GLuint GlassProgramID;
 
 GLuint cubeVertexBufferID;
 GLuint cubeIndexBufferID;
@@ -47,6 +48,7 @@ GLDisplayWidget::GLDisplayWidget()
 	time = 0.0;
 	meCamera = new MeCamera;
 	RenderCamera = new MeCamera;
+	RenderCamera->UP = glm::vec3(0,1,0);
 	ReadObjName = "objs/teapot.obj";// default one
 	printf("read obj is %s", ReadObjName);
 
@@ -67,7 +69,7 @@ void GLDisplayWidget::ClockTick()
 void GLDisplayWidget::paintGL() {
 
 	//In here render to my new frame Buffer 
-	//glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 
 	glClearColor(0.05, 0.3, 0.05, 1.0);
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
@@ -82,7 +84,7 @@ void GLDisplayWidget::paintGL() {
 	modelScaleMatrix = glm::scale(mat4(), glm::vec3(45.0f,45.0f,45.0f));
 
 	mat4 ModelToWorldMatrix = modelTransformMatrix * modelRotateMatrix *  modelScaleMatrix;
-	mat4 ModelToViewMatrix = meCamera->getWorldToViewMatrix() * ModelToWorldMatrix;
+	mat4 ModelToViewMatrix = RenderCamera->getWorldToViewMatrix() * ModelToWorldMatrix;
 	mat4 fullTransformMatrix = projectionMatrix * ModelToViewMatrix;
 
 	GLint fullTransformMatrixUniformLocation = glGetUniformLocation(CubeMapProgramID, "modelToProjectionMatrix");
@@ -96,15 +98,81 @@ void GLDisplayWidget::paintGL() {
 	GLint Light1IntensityUniformLocation = glGetUniformLocation(CubeMapProgramID, "pointLightIntensity");
 	glUniform1f(Light1PositionUniformLocation, pointLight1Intensity);
 	GLuint cameraUniformLocation = glGetUniformLocation(CubeMapProgramID, "cameraPositionWorld");
-	glm::vec3 cameraPosition = meCamera->position;
+	glm::vec3 cameraPosition = RenderCamera->position;
 	glUniform3fv(cameraUniformLocation, 1, &cameraPosition[0]);
 	GLuint diffuseMapUniformLocation = glGetUniformLocation(CubeMapProgramID, "diffuseTexture");
 	glUniform1i(diffuseMapUniformLocation, 0);
 	GLuint speculareMapUniformLocation = glGetUniformLocation(CubeMapProgramID, "specularTexture");
 	glUniform1i(speculareMapUniformLocation, 1);
 	GLuint cubeMapUniformLocation = glGetUniformLocation(CubeMapProgramID, "CubeMapTexture");
-	glUniform1i(cubeMapUniformLocation, 3);
+	glUniform1i(cubeMapUniformLocation,2);
 	GLuint DrawSkyboxUniformLocation = glGetUniformLocation(CubeMapProgramID, "DrawSkyBox");
+	glUniform1i(DrawSkyboxUniformLocation, 1);
+	glBindVertexArray(cubeVertexArrayObjectID);
+	glDrawElements(GL_TRIANGLES, cubeIndices, GL_UNSIGNED_SHORT, 0);
+
+	//This one for teapot
+
+	glEnable(GL_DEPTH_TEST);//Enable this for object
+
+	modelTransformMatrix = glm::translate(mat4(), glm::vec3(0.0f, 0.0f, 0.0f)); // Because I scale by 0.2, I need to cut my BBOX by 0.2
+	modelRotateMatrix = glm::rotate(mat4(), 90.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+	modelScaleMatrix = glm::scale(mat4(), glm::vec3(0.2f, 0.2f, 0.2f));
+
+	ModelToWorldMatrix = modelTransformMatrix * modelRotateMatrix *  modelScaleMatrix;
+	ModelToViewMatrix = RenderCamera->getWorldToViewMatrix() * ModelToWorldMatrix;
+	fullTransformMatrix = projectionMatrix * ModelToViewMatrix;
+
+	glUniformMatrix4fv(fullTransformMatrixUniformLocation, 1, GL_FALSE, &fullTransformMatrix[0][0]);
+	glUniformMatrix4fv(modelToWroldMatrixUniformLocation, 1, GL_FALSE, &ModelToWorldMatrix[0][0]);
+	glUniform1i(DrawSkyboxUniformLocation, 0);
+
+	glBindVertexArray(teapotVertexArrayObjectID);
+	glDrawElements(GL_TRIANGLES, teapotIndices, GL_UNSIGNED_INT, 0);
+
+
+
+	//Don't draw plane for render to texture operation as the plane acts as a glass that should not reflect itself
+
+	//Finish rendering to frame Buffer
+	//Now use a simple plane to display the texture
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glViewport(0, 0, width(), height());
+	glDisable(GL_DEPTH_TEST);//Disable this for cubemap
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+	glUseProgram(CubeMapProgramID);
+
+	modelTransformMatrix = glm::translate(mat4(), glm::vec3(0.0f, 0.0f, 0.0f)); // Because I scale by 0.2, I need to cut my BBOX by 0.2
+	modelRotateMatrix = glm::rotate(mat4(), 0.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+	modelScaleMatrix = glm::scale(mat4(), glm::vec3(45.0f, 45.0f, 45.0f));
+
+	ModelToWorldMatrix = modelTransformMatrix * modelRotateMatrix *  modelScaleMatrix;
+	ModelToViewMatrix = meCamera->getWorldToViewMatrix() * ModelToWorldMatrix;
+	fullTransformMatrix = projectionMatrix * ModelToViewMatrix;
+
+	//Now draw real cube map
+
+	fullTransformMatrixUniformLocation = glGetUniformLocation(CubeMapProgramID, "modelToProjectionMatrix");
+	glUniformMatrix4fv(fullTransformMatrixUniformLocation, 1, GL_FALSE, &fullTransformMatrix[0][0]);
+	modelToWroldMatrixUniformLocation = glGetUniformLocation(CubeMapProgramID, "modelToWorldTransMatrix");
+	glUniformMatrix4fv(modelToWroldMatrixUniformLocation, 1, GL_FALSE, &ModelToWorldMatrix[0][0]);
+	ambientUniformLocation = glGetUniformLocation(CubeMapProgramID, "ambientLightUniform");
+	glUniform3fv(ambientUniformLocation, 1, &ambientAmount[0]);
+	Light1PositionUniformLocation = glGetUniformLocation(CubeMapProgramID, "pointLightPosition");
+	glUniform3fv(Light1PositionUniformLocation, 1, &pointLight1Position[0]);
+	Light1IntensityUniformLocation = glGetUniformLocation(CubeMapProgramID, "pointLightIntensity");
+	glUniform1f(Light1PositionUniformLocation, pointLight1Intensity);
+	cameraUniformLocation = glGetUniformLocation(CubeMapProgramID, "cameraPositionWorld");
+	cameraPosition = meCamera->position;
+	glUniform3fv(cameraUniformLocation, 1, &cameraPosition[0]);
+	diffuseMapUniformLocation = glGetUniformLocation(CubeMapProgramID, "diffuseTexture");
+	glUniform1i(diffuseMapUniformLocation, 0);
+	speculareMapUniformLocation = glGetUniformLocation(CubeMapProgramID, "specularTexture");
+	glUniform1i(speculareMapUniformLocation, 1);
+	cubeMapUniformLocation = glGetUniformLocation(CubeMapProgramID, "CubeMapTexture");
+	glUniform1i(cubeMapUniformLocation, 2);
+	DrawSkyboxUniformLocation = glGetUniformLocation(CubeMapProgramID, "DrawSkyBox");
 	glUniform1i(DrawSkyboxUniformLocation, 1);
 	glBindVertexArray(cubeVertexArrayObjectID);
 	glDrawElements(GL_TRIANGLES, cubeIndices, GL_UNSIGNED_SHORT, 0);
@@ -128,7 +196,11 @@ void GLDisplayWidget::paintGL() {
 	glBindVertexArray(teapotVertexArrayObjectID);
 	glDrawElements(GL_TRIANGLES, teapotIndices, GL_UNSIGNED_INT, 0);
 
+	//Here draw the plane
+
+
 	//Draw Plane
+	glUseProgram(GlassProgramID);
 	modelTransformMatrix = glm::translate(mat4(), glm::vec3(0.0f, 0.0f, 0.0f)); // Because I scale by 0.2, I need to cut my BBOX by 0.2
 	modelRotateMatrix = glm::rotate(mat4(), 90.0f, glm::vec3(1.0f, 0.0f, 0.0f));
 	modelScaleMatrix = glm::scale(mat4(), glm::vec3(5.0f, 5.0f,5.0f));
@@ -137,40 +209,13 @@ void GLDisplayWidget::paintGL() {
 	ModelToViewMatrix = meCamera->getWorldToViewMatrix() * ModelToWorldMatrix;
 	fullTransformMatrix = projectionMatrix * ModelToViewMatrix;
 
+	fullTransformMatrixUniformLocation = glGetUniformLocation(GlassProgramID, "modelToProjectionMatrix");
 	glUniformMatrix4fv(fullTransformMatrixUniformLocation, 1, GL_FALSE, &fullTransformMatrix[0][0]);
-	glUniformMatrix4fv(modelToWroldMatrixUniformLocation, 1, GL_FALSE, &ModelToWorldMatrix[0][0]);
-	glUniform1i(DrawSkyboxUniformLocation, 0);
+	GLuint ReverseTextureUniformLocation = glGetUniformLocation(GlassProgramID, "ReversedSceneTexture");
+	glUniform1i(ReverseTextureUniformLocation,3);
 
 	glBindVertexArray(planeVertexArrayObjectID);
 	glDrawElements(GL_TRIANGLES, planeIndices, GL_UNSIGNED_SHORT, 0);
-
-	//Finish rendering to frame Buffer
-	//Now use a simple plane to display the texture
-	//glViewport(0, 0, width(), height());
-	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	//glDisable(GL_DEPTH_TEST);
-	//glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	//glClear(GL_COLOR_BUFFER_BIT);
-	//glUseProgram(PostProcessingProgramID);
-
-	//modelTransformMatrix = glm::translate(mat4(), glm::vec3(0.0f, 0.0f, 0.0f)); // Because I scale by 0.2, I need to cut my BBOX by 0.2
-	//printf("Offset is %f in X, %f in Y, %f in z \n", (BBoxMax.x + BBoxMin.x) / 2.0f * 0.2f, (BBoxMax.y + BBoxMin.y) / 2.0f * 0.2f, (BBoxMax.z + BBoxMin.z) / 2.0f * 0.2f);
-	//modelRotateMatrix = glm::rotate(mat4(), 30.0f, glm::vec3(-1.0f, 0.0f, 0.0f));
-	//modelScaleMatrix = glm::scale(mat4(), glm::vec3(3.0f,3.0f, 3.0f));
-
-	//ModelToWorldMatrix = modelTransformMatrix * modelRotateMatrix *  modelScaleMatrix;
-	//ModelToViewMatrix = RenderCamera->getWorldToViewMatrix() * ModelToWorldMatrix;
-	//fullTransformMatrix = projectionMatrix * ModelToViewMatrix;
-
-	//glBindVertexArray(planeVertexArrayObjectID);
-	//glActiveTexture(GL_TEXTURE2);
-	//glBindTexture(GL_TEXTURE_2D, framebufferTexture);
-	//GLuint framebufferTextureUniformLoc = glGetUniformLocation(PostProcessingProgramID, "frameBufferTexture");
-	//glUniform1i(framebufferTextureUniformLoc,2);
-	//fullTransformMatrixUniformLocation = glGetUniformLocation(PostProcessingProgramID, "modelToProjectionMatrix");
-	//glUniformMatrix4fv(fullTransformMatrixUniformLocation, 1, GL_FALSE, &fullTransformMatrix[0][0]);
-
-	//glDrawElements(GL_TRIANGLES, planeIndices, GL_UNSIGNED_SHORT, 0);
 
 	/*glBindVertexArray(planeVertexArrayObjectID);
 	glDrawElements(GL_TRIANGLES, planeIndices, GL_UNSIGNED_SHORT, 0);*/ // For display plane only
@@ -217,12 +262,11 @@ void GLDisplayWidget::setupFrameBuffer()
 
 
 	glGenTextures(1, &framebufferTexture);
-	glActiveTexture(GL_TEXTURE2); // Use texture unit 2
+	glActiveTexture(GL_TEXTURE3); // Use texture unit 2
 	glBindTexture(GL_TEXTURE_2D, framebufferTexture);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1024, 1024, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glGenerateMipmap(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, 0); //bind back to default
 
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, framebufferTexture, 0);
@@ -312,7 +356,7 @@ void GLDisplayWidget::sendDataToOpenGL() {
 		GL_LINEAR);
 
 	//Environment map information
-	glActiveTexture(GL_TEXTURE3); // 3 for cube map 
+	glActiveTexture(GL_TEXTURE2); // 3 for cube map 
 	GLuint EnvironmentMapTextureID;
 	glGenTextures(1, &EnvironmentMapTextureID);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, EnvironmentMapTextureID);
@@ -499,6 +543,8 @@ void GLDisplayWidget::installShaders() {
 	GLuint  PPfragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
 	GLuint  CubeMapvertexShaderID = glCreateShader(GL_VERTEX_SHADER);
 	GLuint  CubeMapfragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
+	GLuint  GlassvertexShaderID = glCreateShader(GL_VERTEX_SHADER);
+	GLuint  GlassfragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
 
 	string temp = readShaderCode("shaders/passThroughVertexShader.glsl");
 	const GLchar* adapter[1];
@@ -526,12 +572,22 @@ void GLDisplayWidget::installShaders() {
 	adapter[0] = temp.c_str();
 	glShaderSource(CubeMapfragmentShaderID, 1, adapter, 0);
 
+	temp = readShaderCode("shaders/GlassVertexShader.glsl");
+	adapter[0] = temp.c_str();
+	glShaderSource(GlassvertexShaderID, 1, adapter, 0);
+
+	temp = readShaderCode("shaders/GlassFragmentShader.glsl");
+	adapter[0] = temp.c_str();
+	glShaderSource(GlassfragmentShaderID, 1, adapter, 0);
+
 	glCompileShader(vertexShaderID);
 	glCompileShader(fragmentShaderID);
 	glCompileShader(PPvertexShaderID);
 	glCompileShader(PPfragmentShaderID);
 	glCompileShader(CubeMapvertexShaderID);
 	glCompileShader(CubeMapfragmentShaderID);
+	glCompileShader(GlassvertexShaderID);
+	glCompileShader(GlassfragmentShaderID);
 
 	if (!checkShaderStatus(vertexShaderID)
 		|| !checkShaderStatus(fragmentShaderID)
@@ -539,6 +595,8 @@ void GLDisplayWidget::installShaders() {
 		|| !checkShaderStatus(PPfragmentShaderID)
 		|| !checkShaderStatus(CubeMapvertexShaderID)
 		|| !checkShaderStatus(CubeMapfragmentShaderID)
+		|| !checkShaderStatus(GlassvertexShaderID)
+		|| !checkShaderStatus(GlassfragmentShaderID)
 		) {
 		return;
 	}
@@ -558,7 +616,13 @@ void GLDisplayWidget::installShaders() {
 	glAttachShader(CubeMapProgramID, CubeMapfragmentShaderID);
 	glLinkProgram(CubeMapProgramID);
 
-	if (!checkProgramStatus(PassThroughProgramID) || !checkProgramStatus(PostProcessingProgramID) || !checkProgramStatus(CubeMapProgramID)) {
+	GlassProgramID = glCreateProgram();
+	glAttachShader(GlassProgramID, GlassvertexShaderID);
+	glAttachShader(GlassProgramID, GlassfragmentShaderID);
+	glLinkProgram(GlassProgramID);
+
+	if (!checkProgramStatus(PassThroughProgramID) || !checkProgramStatus(PostProcessingProgramID) 
+		|| !checkProgramStatus(CubeMapProgramID) || !checkProgramStatus(GlassProgramID)) {
 		return;
 	}
 }

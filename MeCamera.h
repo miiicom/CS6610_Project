@@ -13,7 +13,7 @@ public:
 	glm::vec3 getUp();
 	glm::vec3 position;
 	glm::vec3 viewDirection;
-	const glm::vec3 UP;
+	glm::vec3 UP;
 	glm::vec3 strafeDirection;
 	static const float MOVEMENT_SPEED;
 
