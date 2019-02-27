@@ -19,6 +19,7 @@ public:
 	void setPointLightPosition(float Xmovement, float Ymovement);
 	MeCamera * meCamera;
 	MeCamera * RenderCamera;
+	MeCamera * LightCamera;
 	const char* ReadObjName;
 protected:
 	void paintGL();

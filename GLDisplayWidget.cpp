@@ -45,12 +45,15 @@ GLDisplayWidget::GLDisplayWidget()
 
 	time = 0.0;
 	meCamera = new MeCamera;
-	RenderCamera = new MeCamera;
+	RenderCamera = new MeCamera; 
+	LightCamera = new MeCamera;
 	ReadObjName = "objs/teapot.obj";// default one
 	printf("read obj is %s", ReadObjName);
 
 	ambientAmount = glm::vec3(0.05f, 0.05f, 0.05f);
-	pointLight1Position = glm::vec3(0.00f, 0.00f,20.00f);
+	pointLight1Position = glm::vec3(0.00f, 10.00f,7.50f);
+	LightCamera->position = pointLight1Position;
+	LightCamera->viewDirection = -pointLight1Position; //set up light camera so it is always looking at center
 	pointLight1Intensity = 1.0f;
 }
 
@@ -78,12 +81,12 @@ void GLDisplayWidget::paintGL() {
 	//modelTransformMatrix = glm::translate(mat4(), glm::vec3((BBoxMax.x+BBoxMin.x)/2.0f * 0.2f, (BBoxMax.y+BBoxMin.y)/2.0f * 0.2f, (BBoxMax.z + BBoxMin.z)/2.0f * 0.2f)); // Because I scale by 0.2, I need to cut my BBOX by 0.2
 	//modelTransformMatrix = glm::translate(mat4(), glm::vec3(0.0f, 0.0f, (BBoxMax.z + BBoxMin.z) / 2.0f * 0.2f)); // Because I scale by 0.2, I need to cut my BBOX by 0.2
 	modelTransformMatrix = glm::translate(mat4(), glm::vec3(0.0f,0.0f,0.0f)); // Because I scale by 0.2, I need to cut my BBOX by 0.2
-	printf("Offset is %f in X, %f in Y, %f in z \n", (BBoxMax.x + BBoxMin.x) / 2.0f * 0.2f, (BBoxMax.y + BBoxMin.y) / 2.0f * 0.2f, (BBoxMax.z + BBoxMin.z) / 2.0f * 0.2f);
-	modelRotateMatrix = glm::rotate(mat4(), 90.0f, glm::vec3(-1.0f, 0.0f, 0.0f));
+	//printf("Offset is %f in X, %f in Y, %f in z \n", (BBoxMax.x + BBoxMin.x) / 2.0f * 0.2f, (BBoxMax.y + BBoxMin.y) / 2.0f * 0.2f, (BBoxMax.z + BBoxMin.z) / 2.0f * 0.2f);
+	modelRotateMatrix = glm::rotate(mat4(),0.0f, glm::vec3(1.0f, 1.0f, 1.0f));
 	modelScaleMatrix = glm::scale(mat4(), glm::vec3(0.2f,0.2f,0.2f));
 
 	mat4 ModelToWorldMatrix = modelTransformMatrix * modelRotateMatrix *  modelScaleMatrix;
-	mat4 ModelToViewMatrix = meCamera->getWorldToViewMatrix() * ModelToWorldMatrix;
+	mat4 ModelToViewMatrix = LightCamera->getWorldToViewMatrix() * ModelToWorldMatrix;
 	mat4 fullTransformMatrix = projectionMatrix * ModelToViewMatrix;
 
 	GLint fullTransformMatrixUniformLocation = glGetUniformLocation(PassThroughProgramID, "modelToProjectionMatrix");
@@ -97,7 +100,7 @@ void GLDisplayWidget::paintGL() {
 	GLint Light1IntensityUniformLocation = glGetUniformLocation(PassThroughProgramID, "pointLightIntensity");
 	glUniform1f(Light1PositionUniformLocation, pointLight1Intensity);
 	GLuint cameraUniformLocation = glGetUniformLocation(PassThroughProgramID, "cameraPositionWorld");
-	glm::vec3 cameraPosition = meCamera->position;
+	glm::vec3 cameraPosition = LightCamera->position;
 	glUniform3fv(cameraUniformLocation, 1, &cameraPosition[0]);
 	GLuint diffuseMapUniformLocation = glGetUniformLocation(PassThroughProgramID, "diffuseTexture");
 	glUniform1i(diffuseMapUniformLocation, 0);
