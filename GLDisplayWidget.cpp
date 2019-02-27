@@ -88,70 +88,112 @@ void GLDisplayWidget::paintGL() {
 
 	mat4 ModelToWorldMatrix = modelTransformMatrix * modelRotateMatrix *  modelScaleMatrix;
 	mat4 ModelToViewMatrix = LightCamera->getWorldToViewMatrix() * ModelToWorldMatrix;
-	mat4 fullTransformMatrix = projectionMatrix * ModelToViewMatrix;
+	mat4 DepthfullTransformMatrix = projectionMatrix * ModelToViewMatrix;
 
 	GLint fullTransformMatrixUniformLocation = glGetUniformLocation(DepthRenderProgramID, "modelToProjectionMatrix");
-	glUniformMatrix4fv(fullTransformMatrixUniformLocation, 1, GL_FALSE, &fullTransformMatrix[0][0]);
-	//GLint modelToWroldMatrixUniformLocation = glGetUniformLocation(PassThroughProgramID, "modelToWorldTransMatrix");
-	//glUniformMatrix4fv(modelToWroldMatrixUniformLocation, 1, GL_FALSE, &ModelToWorldMatrix[0][0]);
-	//GLint ambientUniformLocation = glGetUniformLocation(PassThroughProgramID, "ambientLightUniform");
-	//glUniform3fv(ambientUniformLocation, 1, &ambientAmount[0]);
-	//GLint Light1PositionUniformLocation = glGetUniformLocation(PassThroughProgramID, "pointLightPosition");
-	//glUniform3fv(Light1PositionUniformLocation, 1, &pointLight1Position[0]);
-	//GLint Light1IntensityUniformLocation = glGetUniformLocation(PassThroughProgramID, "pointLightIntensity");
-	//glUniform1f(Light1PositionUniformLocation, pointLight1Intensity);
-	//GLuint cameraUniformLocation = glGetUniformLocation(PassThroughProgramID, "cameraPositionWorld");
-	//glm::vec3 cameraPosition = LightCamera->position;
-	//glUniform3fv(cameraUniformLocation, 1, &cameraPosition[0]);
-	//GLuint diffuseMapUniformLocation = glGetUniformLocation(PassThroughProgramID, "diffuseTexture");
-	//glUniform1i(diffuseMapUniformLocation, 0);
-	//GLuint speculareMapUniformLocation = glGetUniformLocation(PassThroughProgramID, "specularTexture");
-	//glUniform1i(speculareMapUniformLocation, 1);
+	glUniformMatrix4fv(fullTransformMatrixUniformLocation, 1, GL_FALSE, &DepthfullTransformMatrix[0][0]);
 	glBindVertexArray(teapotVertexArrayObjectID);
 	glDrawElements(GL_TRIANGLES, teapotIndices, GL_UNSIGNED_INT, 0);
 
 	modelTransformMatrix = glm::translate(mat4(), glm::vec3(0.0f, 0.0f, 0.0f)); // Because I scale by 0.2, I need to cut my BBOX by 0.2
 	modelRotateMatrix = glm::rotate(mat4(), 0.0f, glm::vec3(1.0f, 1.0f, 1.0f));
-	modelScaleMatrix = glm::scale(mat4(), glm::vec3(5.0f, 5.0f, 5.0f));
+	modelScaleMatrix = glm::scale(mat4(), glm::vec3(0.2f, 0.2f, 0.2f));
 
 	ModelToWorldMatrix = modelTransformMatrix * modelRotateMatrix *  modelScaleMatrix;
 	ModelToViewMatrix = LightCamera->getWorldToViewMatrix() * ModelToWorldMatrix;
-	fullTransformMatrix = projectionMatrix * ModelToViewMatrix;
+	DepthfullTransformMatrix = projectionMatrix * ModelToViewMatrix;
 
 	fullTransformMatrixUniformLocation = glGetUniformLocation(DepthRenderProgramID, "modelToProjectionMatrix");
-	glUniformMatrix4fv(fullTransformMatrixUniformLocation, 1, GL_FALSE, &fullTransformMatrix[0][0]);
+	glUniformMatrix4fv(fullTransformMatrixUniformLocation, 1, GL_FALSE, &DepthfullTransformMatrix[0][0]);
 
 	glBindVertexArray(planeVertexArrayObjectID);
 	glDrawElements(GL_TRIANGLES, planeIndices, GL_UNSIGNED_SHORT, 0);
 
-	//Finish rendering to frame Buffer
-	//Now use a simple plane to display the texture
+	//-------------------------shadow implementation-----------------------------
 	glViewport(0, 0, width(), height());
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glDisable(GL_DEPTH_TEST);
+	glEnable(GL_DEPTH_TEST);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
-	glUseProgram(PostProcessingProgramID);
+	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+	glUseProgram(PassThroughProgramID);
 
 	projectionMatrix = glm::perspective(60.0f, ((float)width()) / height(), 0.01f, 50.0f);
 	modelTransformMatrix = glm::translate(mat4(), glm::vec3(0.0f, 0.0f, 0.0f)); // Because I scale by 0.2, I need to cut my BBOX by 0.2
-	printf("Offset is %f in X, %f in Y, %f in z \n", (BBoxMax.x + BBoxMin.x) / 2.0f * 0.2f, (BBoxMax.y + BBoxMin.y) / 2.0f * 0.2f, (BBoxMax.z + BBoxMin.z) / 2.0f * 0.2f);
-	modelRotateMatrix = glm::rotate(mat4(), 30.0f, glm::vec3(-1.0f, 0.0f, 0.0f));
-	modelScaleMatrix = glm::scale(mat4(), glm::vec3(3.0f,3.0f, 3.0f));
+	//printf("Offset is %f in X, %f in Y, %f in z \n", (BBoxMax.x + BBoxMin.x) / 2.0f * 0.2f, (BBoxMax.y + BBoxMin.y) / 2.0f * 0.2f, (BBoxMax.z + BBoxMin.z) / 2.0f * 0.2f);
+	modelRotateMatrix = glm::rotate(mat4(), 0.0f, glm::vec3(1.0f, 1.0f, 1.0f));
+	modelScaleMatrix = glm::scale(mat4(), glm::vec3(0.2f,0.2f, 0.2f));
 
 	ModelToWorldMatrix = modelTransformMatrix * modelRotateMatrix *  modelScaleMatrix;
 	ModelToViewMatrix = RenderCamera->getWorldToViewMatrix() * ModelToWorldMatrix;
-	fullTransformMatrix = projectionMatrix * ModelToViewMatrix;
+	mat4 fullTransformMatrix = projectionMatrix * ModelToViewMatrix;
 
-	glBindVertexArray(planeVertexArrayObjectID);
+	glm::mat4 biasMatrix(
+		0.5, 0.0, 0.0, 0.0,
+		0.0, 0.5, 0.0, 0.0,
+		0.0, 0.0, 0.5, 0.0,
+		0.5, 0.5, 0.5, 1.0
+	);
+
+	glm::mat4 DepthBiasFullTransformMatrix = biasMatrix * DepthfullTransformMatrix;
+	
+	//glActiveTexture(GL_TEXTURE2);
+	//glBindTexture(GL_TEXTURE_2D, framebufferTexture);
+	fullTransformMatrixUniformLocation = glGetUniformLocation(PassThroughProgramID, "modelToProjectionMatrix");
+	glUniformMatrix4fv(fullTransformMatrixUniformLocation, 1, GL_FALSE, &fullTransformMatrix[0][0]);
+	GLint BiasMVPUniformLocation = glGetUniformLocation(PassThroughProgramID, "BiasmodelToProjectionMatrix");
+	glUniformMatrix4fv(BiasMVPUniformLocation, 1, GL_FALSE, &DepthBiasFullTransformMatrix[0][0]);
+	GLint modelToWroldMatrixUniformLocation = glGetUniformLocation(PassThroughProgramID, "modelToWorldTransMatrix");
+	glUniformMatrix4fv(modelToWroldMatrixUniformLocation, 1, GL_FALSE, &ModelToWorldMatrix[0][0]);
+	GLint ambientUniformLocation = glGetUniformLocation(PassThroughProgramID, "ambientLightUniform");
+	glUniform3fv(ambientUniformLocation, 1, &ambientAmount[0]);
+	GLint Light1PositionUniformLocation = glGetUniformLocation(PassThroughProgramID, "pointLightPosition");
+	glUniform3fv(Light1PositionUniformLocation, 1, &pointLight1Position[0]);
+	GLint Light1IntensityUniformLocation = glGetUniformLocation(PassThroughProgramID, "pointLightIntensity");
+	glUniform1f(Light1PositionUniformLocation, pointLight1Intensity);
+	GLuint cameraUniformLocation = glGetUniformLocation(PassThroughProgramID, "cameraPositionWorld");
+	glm::vec3 cameraPosition = meCamera->position;
+	glUniform3fv(cameraUniformLocation, 1, &cameraPosition[0]);
+	GLuint diffuseMapUniformLocation = glGetUniformLocation(PassThroughProgramID, "diffuseTexture");
+	glUniform1i(diffuseMapUniformLocation, 0);
+	GLuint speculareMapUniformLocation = glGetUniformLocation(PassThroughProgramID, "specularTexture");
+	glUniform1i(speculareMapUniformLocation, 1);
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, framebufferTexture);
-	GLuint framebufferTextureUniformLoc = glGetUniformLocation(PostProcessingProgramID, "frameBufferTexture");
-	glUniform1i(framebufferTextureUniformLoc,2);
-	fullTransformMatrixUniformLocation = glGetUniformLocation(PostProcessingProgramID, "modelToProjectionMatrix");
-	glUniformMatrix4fv(fullTransformMatrixUniformLocation, 1, GL_FALSE, &fullTransformMatrix[0][0]);
+	GLuint framebufferTextureUniformLoc = glGetUniformLocation(PassThroughProgramID, "frameBufferTexture");
+	glUniform1i(framebufferTextureUniformLoc, 2);
 
+	glBindVertexArray(teapotVertexArrayObjectID);
+	glDrawElements(GL_TRIANGLES, teapotIndices, GL_UNSIGNED_INT, 0);
+
+	glBindVertexArray(planeVertexArrayObjectID);
 	glDrawElements(GL_TRIANGLES, planeIndices, GL_UNSIGNED_SHORT, 0);
+	////---------Debug frame buffer-------------------
+	//glViewport(0, 0, width(), height());
+	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	//glDisable(GL_DEPTH_TEST);
+	//glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	//glClear(GL_COLOR_BUFFER_BIT);
+	//glUseProgram(PostProcessingProgramID);
+
+	//projectionMatrix = glm::perspective(60.0f, ((float)width()) / height(), 0.01f, 50.0f);
+	//modelTransformMatrix = glm::translate(mat4(), glm::vec3(0.0f, 0.0f, 0.0f)); // Because I scale by 0.2, I need to cut my BBOX by 0.2
+	//printf("Offset is %f in X, %f in Y, %f in z \n", (BBoxMax.x + BBoxMin.x) / 2.0f * 0.2f, (BBoxMax.y + BBoxMin.y) / 2.0f * 0.2f, (BBoxMax.z + BBoxMin.z) / 2.0f * 0.2f);
+	//modelRotateMatrix = glm::rotate(mat4(), 30.0f, glm::vec3(-1.0f, 0.0f, 0.0f));
+	//modelScaleMatrix = glm::scale(mat4(), glm::vec3(1.0f, 1.0f, 1.0f));
+
+	//ModelToWorldMatrix = modelTransformMatrix * modelRotateMatrix *  modelScaleMatrix;
+	//ModelToViewMatrix = RenderCamera->getWorldToViewMatrix() * ModelToWorldMatrix;
+	//mat4 fullTransformMatrix = projectionMatrix * ModelToViewMatrix;
+
+	//glBindVertexArray(planeVertexArrayObjectID);
+	//glActiveTexture(GL_TEXTURE2);
+	//glBindTexture(GL_TEXTURE_2D, framebufferTexture);
+	//GLuint framebufferTextureUniformLoc = glGetUniformLocation(PostProcessingProgramID, "frameBufferTexture");
+	//glUniform1i(framebufferTextureUniformLoc, 2);
+	//fullTransformMatrixUniformLocation = glGetUniformLocation(PostProcessingProgramID, "modelToProjectionMatrix");
+	//glUniformMatrix4fv(fullTransformMatrixUniformLocation, 1, GL_FALSE, &fullTransformMatrix[0][0]);
+
+	//glDrawElements(GL_TRIANGLES, planeIndices, GL_UNSIGNED_SHORT, 0);
 
 	/*glBindVertexArray(planeVertexArrayObjectID);
 	glDrawElements(GL_TRIANGLES, planeIndices, GL_UNSIGNED_SHORT, 0);*/ // For display plane only

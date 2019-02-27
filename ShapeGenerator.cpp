@@ -151,19 +151,19 @@ ShapeData ShapeGenerator::makefillerQuard()
 	ShapeData ret;
 	Vertex verts[] =
 	{	//Main sahpe
-		glm::vec3(+1.0f, +1.0f, +0.0f),			// position
+		glm::vec3(+20.0f, +20.0f, +0.0f),			// position
 		glm::vec3(+0.0f, +0.0f, +1.0f),			// normal
 		glm::vec2(+1.0f, +1.0f),					// uv
 
-		glm::vec3(+1.0f, -1.0f, +0.0f),			// position
+		glm::vec3(+20.0f, -20.0f, +0.0f),			// position
 		glm::vec3(+0.0f, +0.0f, +1.0f),			// normal
 		glm::vec2(+1.0f, +0.0f),					// uv
 
-		glm::vec3(-1.0f, +1.0f, +0.0f),			// position
+		glm::vec3(-20.0f, +20.0f, +0.0f),			// position
 		glm::vec3(+0.0f, +0.0f, +1.0f),			// normal
 		glm::vec2(+0.0f, +1.0f),					// uv
 
-		glm::vec3(-1.0f, -1.0f, +0.0f),			// position
+		glm::vec3(-20.0f, -20.0f, +0.0f),			// position
 		glm::vec3(+0.0f, +0.0f, +1.0f),			// normal
 		glm::vec2(+0.0f, +0.0f),					// uv
 	};
