@@ -53,7 +53,9 @@ GLDisplayWidget::GLDisplayWidget()
 
 	ambientAmount = glm::vec3(0.05f, 0.05f, 0.05f);
 	pointLight1Position = glm::vec3(0.00f, 10.00f,7.50f);
+	RenderCamera->position = glm::vec3(0.0f, 0.0f,5.0f);
 	LightCamera->position = pointLight1Position;
+	LightCamera->UP = glm::vec3(0.0, -1.0, 0.0);
 	LightCamera->viewDirection = -pointLight1Position; //set up light camera so it is always looking at center
 	pointLight1Intensity = 1.0f;
 }
@@ -72,17 +74,15 @@ void GLDisplayWidget::paintGL() {
 	//In here render to my new frame Buffer 
 	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 	glCullFace(GL_FRONT);
-	glClearColor(0.05, 0.3, 0.05, 1.0);
+	glClearColor(0.05, 0.3, 0.05, 0.0);
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 	glViewport(0, 0, width(), height());
 	glEnable(GL_DEPTH_TEST);
-	glUseProgram(PassThroughProgramID);
+	glUseProgram(DepthRenderProgramID);
 
-	glm::mat4 projectionMatrix = glm::perspective(60.0f, ((float)width()) / height(), 0.01f, 50.0f); // Projection matrix
-	//modelTransformMatrix = glm::translate(mat4(), glm::vec3((BBoxMax.x+BBoxMin.x)/2.0f * 0.2f, (BBoxMax.y+BBoxMin.y)/2.0f * 0.2f, (BBoxMax.z + BBoxMin.z)/2.0f * 0.2f)); // Because I scale by 0.2, I need to cut my BBOX by 0.2
-	//modelTransformMatrix = glm::translate(mat4(), glm::vec3(0.0f, 0.0f, (BBoxMax.z + BBoxMin.z) / 2.0f * 0.2f)); // Because I scale by 0.2, I need to cut my BBOX by 0.2
+	//glm::mat4 projectionMatrix = glm::perspective(60.0f, ((float)width()) / height(), 0.01f, 50.0f); // Projection matrix
+	glm::mat4 projectionMatrix = glm::ortho<float>(-10, 10, -10, 10, -10, 50); // Projection matrix
 	modelTransformMatrix = glm::translate(mat4(), glm::vec3(0.0f,0.0f,0.0f)); // Because I scale by 0.2, I need to cut my BBOX by 0.2
-	//printf("Offset is %f in X, %f in Y, %f in z \n", (BBoxMax.x + BBoxMin.x) / 2.0f * 0.2f, (BBoxMax.y + BBoxMin.y) / 2.0f * 0.2f, (BBoxMax.z + BBoxMin.z) / 2.0f * 0.2f);
 	modelRotateMatrix = glm::rotate(mat4(),0.0f, glm::vec3(1.0f, 1.0f, 1.0f));
 	modelScaleMatrix = glm::scale(mat4(), glm::vec3(0.2f,0.2f,0.2f));
 
@@ -90,25 +90,39 @@ void GLDisplayWidget::paintGL() {
 	mat4 ModelToViewMatrix = LightCamera->getWorldToViewMatrix() * ModelToWorldMatrix;
 	mat4 fullTransformMatrix = projectionMatrix * ModelToViewMatrix;
 
-	GLint fullTransformMatrixUniformLocation = glGetUniformLocation(PassThroughProgramID, "modelToProjectionMatrix");
+	GLint fullTransformMatrixUniformLocation = glGetUniformLocation(DepthRenderProgramID, "modelToProjectionMatrix");
 	glUniformMatrix4fv(fullTransformMatrixUniformLocation, 1, GL_FALSE, &fullTransformMatrix[0][0]);
-	GLint modelToWroldMatrixUniformLocation = glGetUniformLocation(PassThroughProgramID, "modelToWorldTransMatrix");
-	glUniformMatrix4fv(modelToWroldMatrixUniformLocation, 1, GL_FALSE, &ModelToWorldMatrix[0][0]);
-	GLint ambientUniformLocation = glGetUniformLocation(PassThroughProgramID, "ambientLightUniform");
-	glUniform3fv(ambientUniformLocation, 1, &ambientAmount[0]);
-	GLint Light1PositionUniformLocation = glGetUniformLocation(PassThroughProgramID, "pointLightPosition");
-	glUniform3fv(Light1PositionUniformLocation, 1, &pointLight1Position[0]);
-	GLint Light1IntensityUniformLocation = glGetUniformLocation(PassThroughProgramID, "pointLightIntensity");
-	glUniform1f(Light1PositionUniformLocation, pointLight1Intensity);
-	GLuint cameraUniformLocation = glGetUniformLocation(PassThroughProgramID, "cameraPositionWorld");
-	glm::vec3 cameraPosition = LightCamera->position;
-	glUniform3fv(cameraUniformLocation, 1, &cameraPosition[0]);
-	GLuint diffuseMapUniformLocation = glGetUniformLocation(PassThroughProgramID, "diffuseTexture");
-	glUniform1i(diffuseMapUniformLocation, 0);
-	GLuint speculareMapUniformLocation = glGetUniformLocation(PassThroughProgramID, "specularTexture");
-	glUniform1i(speculareMapUniformLocation, 1);
+	//GLint modelToWroldMatrixUniformLocation = glGetUniformLocation(PassThroughProgramID, "modelToWorldTransMatrix");
+	//glUniformMatrix4fv(modelToWroldMatrixUniformLocation, 1, GL_FALSE, &ModelToWorldMatrix[0][0]);
+	//GLint ambientUniformLocation = glGetUniformLocation(PassThroughProgramID, "ambientLightUniform");
+	//glUniform3fv(ambientUniformLocation, 1, &ambientAmount[0]);
+	//GLint Light1PositionUniformLocation = glGetUniformLocation(PassThroughProgramID, "pointLightPosition");
+	//glUniform3fv(Light1PositionUniformLocation, 1, &pointLight1Position[0]);
+	//GLint Light1IntensityUniformLocation = glGetUniformLocation(PassThroughProgramID, "pointLightIntensity");
+	//glUniform1f(Light1PositionUniformLocation, pointLight1Intensity);
+	//GLuint cameraUniformLocation = glGetUniformLocation(PassThroughProgramID, "cameraPositionWorld");
+	//glm::vec3 cameraPosition = LightCamera->position;
+	//glUniform3fv(cameraUniformLocation, 1, &cameraPosition[0]);
+	//GLuint diffuseMapUniformLocation = glGetUniformLocation(PassThroughProgramID, "diffuseTexture");
+	//glUniform1i(diffuseMapUniformLocation, 0);
+	//GLuint speculareMapUniformLocation = glGetUniformLocation(PassThroughProgramID, "specularTexture");
+	//glUniform1i(speculareMapUniformLocation, 1);
 	glBindVertexArray(teapotVertexArrayObjectID);
 	glDrawElements(GL_TRIANGLES, teapotIndices, GL_UNSIGNED_INT, 0);
+
+	modelTransformMatrix = glm::translate(mat4(), glm::vec3(0.0f, 0.0f, 0.0f)); // Because I scale by 0.2, I need to cut my BBOX by 0.2
+	modelRotateMatrix = glm::rotate(mat4(), 0.0f, glm::vec3(1.0f, 1.0f, 1.0f));
+	modelScaleMatrix = glm::scale(mat4(), glm::vec3(5.0f, 5.0f, 5.0f));
+
+	ModelToWorldMatrix = modelTransformMatrix * modelRotateMatrix *  modelScaleMatrix;
+	ModelToViewMatrix = LightCamera->getWorldToViewMatrix() * ModelToWorldMatrix;
+	fullTransformMatrix = projectionMatrix * ModelToViewMatrix;
+
+	fullTransformMatrixUniformLocation = glGetUniformLocation(DepthRenderProgramID, "modelToProjectionMatrix");
+	glUniformMatrix4fv(fullTransformMatrixUniformLocation, 1, GL_FALSE, &fullTransformMatrix[0][0]);
+
+	glBindVertexArray(planeVertexArrayObjectID);
+	glDrawElements(GL_TRIANGLES, planeIndices, GL_UNSIGNED_SHORT, 0);
 
 	//Finish rendering to frame Buffer
 	//Now use a simple plane to display the texture
@@ -119,6 +133,7 @@ void GLDisplayWidget::paintGL() {
 	glClear(GL_COLOR_BUFFER_BIT);
 	glUseProgram(PostProcessingProgramID);
 
+	projectionMatrix = glm::perspective(60.0f, ((float)width()) / height(), 0.01f, 50.0f);
 	modelTransformMatrix = glm::translate(mat4(), glm::vec3(0.0f, 0.0f, 0.0f)); // Because I scale by 0.2, I need to cut my BBOX by 0.2
 	printf("Offset is %f in X, %f in Y, %f in z \n", (BBoxMax.x + BBoxMin.x) / 2.0f * 0.2f, (BBoxMax.y + BBoxMin.y) / 2.0f * 0.2f, (BBoxMax.z + BBoxMin.z) / 2.0f * 0.2f);
 	modelRotateMatrix = glm::rotate(mat4(), 30.0f, glm::vec3(-1.0f, 0.0f, 0.0f));
@@ -208,34 +223,33 @@ void GLDisplayWidget::setupFrameBuffer()
 
 	//---------------End of old frame buffer ---------------------------
 
-	//---------------New Frame Buffer ----------------------------------
-	GLfloat border[] = { 1.0f,0.0f,0.0f,0.0f };
+	// ------------------------------old frame buffers changes-----------------------------------
+
+	glGenFramebuffers(1, &framebuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+
+	//To make framebuffer render to a texture I need to generate a texture object first
+
 
 	glGenTextures(1, &framebufferTexture);
 	glActiveTexture(GL_TEXTURE2); // Use texture unit 2
 	glBindTexture(GL_TEXTURE_2D, framebufferTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 
-		1024, 1024, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, 1024, 1024, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	//glGenerateMipmap(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, 0); //bind back to default
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER); 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER); 
-	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, border); 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE); 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LESS);
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, framebufferTexture, 0);
 
-	glActiveTexture(GL_TEXTURE2); // Use texture unit 2
-	glBindTexture(GL_TEXTURE_2D, framebufferTexture);
+	glDrawBuffer(GL_NONE); // No color buffer is drawn to.
 
-	glGenFramebuffers(1, &framebuffer);
-	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, framebufferTexture, 0);
-	GLenum drawBuffers[] = { GL_NONE };//What is that for?
-	glDrawBuffer(GL_NONE);// Revert to the default framebuffer for nowgl
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	//glActiveTexture(GL_TEXTURE0); // Bind back to default slot
+
+	//---------------End of old frame buffer changes------------------------
 }
 
 void GLDisplayWidget::sendDataToOpenGL() {
