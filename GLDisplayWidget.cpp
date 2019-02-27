@@ -16,6 +16,7 @@ const uint VERTEX_BYTE_SIZE = NUM_FLOATS_PER_VERTICE * sizeof(float);
 
 GLuint PassThroughProgramID;
 GLuint PostProcessingProgramID;
+GLuint DepthRenderProgramID;
 
 GLuint cubeVertexBufferID;
 GLuint cubeIndexBufferID;
@@ -70,7 +71,7 @@ void GLDisplayWidget::paintGL() {
 
 	//In here render to my new frame Buffer 
 	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-
+	glCullFace(GL_FRONT);
 	glClearColor(0.05, 0.3, 0.05, 1.0);
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 	glViewport(0, 0, width(), height());
@@ -175,33 +176,66 @@ void GLDisplayWidget::mouseReleaseEvent(QMouseEvent * event)
 
 void GLDisplayWidget::setupFrameBuffer()
 {
-	glGenFramebuffers(1, &framebuffer);
-	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+	// ------------------------------old frame buffers-----------------------------------
 
-	//To make framebuffer render to a texture I need to generate a texture object first
+	//glGenFramebuffers(1, &framebuffer);
+	//glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 
+	////To make framebuffer render to a texture I need to generate a texture object first
+
+
+	//glGenTextures(1, &framebufferTexture);
+	//glActiveTexture(GL_TEXTURE2); // Use texture unit 2
+	//glBindTexture(GL_TEXTURE_2D, framebufferTexture);
+	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1024, 1024, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	//glGenerateMipmap(GL_TEXTURE_2D);
+	//glBindTexture(GL_TEXTURE_2D, 0); //bind back to default
+
+	//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, framebufferTexture, 0);
+	//// use render Buffer object for depth test
+	//unsigned int renderBufferObject;
+	//glGenRenderbuffers(1, &renderBufferObject);
+	//glBindRenderbuffer(GL_RENDERBUFFER, renderBufferObject);
+	//glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 1024, 1024);
+	//glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, renderBufferObject);
+
+	//if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+	//	std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	////glActiveTexture(GL_TEXTURE0); // Bind back to default slot
+
+	//---------------End of old frame buffer ---------------------------
+
+	//---------------New Frame Buffer ----------------------------------
+	GLfloat border[] = { 1.0f,0.0f,0.0f,0.0f };
 
 	glGenTextures(1, &framebufferTexture);
 	glActiveTexture(GL_TEXTURE2); // Use texture unit 2
 	glBindTexture(GL_TEXTURE_2D, framebufferTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1024, 1024, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glGenerateMipmap(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, 0); //bind back to default
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 
+		1024, 1024, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
 
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, framebufferTexture, 0);
-	// use render Buffer object for depth test
-	unsigned int renderBufferObject;
-	glGenRenderbuffers(1, &renderBufferObject);
-	glBindRenderbuffer(GL_RENDERBUFFER, renderBufferObject);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 1024, 1024);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, renderBufferObject);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); 
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); 
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER); 
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER); 
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, border); 
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE); 
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LESS);
 
+	glActiveTexture(GL_TEXTURE2); // Use texture unit 2
+	glBindTexture(GL_TEXTURE_2D, framebufferTexture);
+
+	glGenFramebuffers(1, &framebuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, framebufferTexture, 0);
+	GLenum drawBuffers[] = { GL_NONE };//What is that for?
+	glDrawBuffer(GL_NONE);// Revert to the default framebuffer for nowgl
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	//glActiveTexture(GL_TEXTURE0); // Bind back to default slot
 }
 
 void GLDisplayWidget::sendDataToOpenGL() {
@@ -408,6 +442,8 @@ void GLDisplayWidget::installShaders() {
 	GLuint  fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
 	GLuint  PPvertexShaderID = glCreateShader(GL_VERTEX_SHADER);
 	GLuint  PPfragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
+	GLuint  DepthRendervertexShaderID = glCreateShader(GL_VERTEX_SHADER);
+	GLuint  DepthRenderfragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
 
 	string temp = readShaderCode("shaders/passThroughVertexShader.glsl");
 	const GLchar* adapter[1];
@@ -427,15 +463,27 @@ void GLDisplayWidget::installShaders() {
 	adapter[0] = temp.c_str();
 	glShaderSource(PPfragmentShaderID, 1, adapter, 0);
 
+	temp = readShaderCode("shaders/DepthRenderVertexShader.glsl");
+	adapter[0] = temp.c_str();
+	glShaderSource(DepthRendervertexShaderID, 1, adapter, 0);
+
+	temp = readShaderCode("shaders/DepthRenderFragmentShader.glsl");
+	adapter[0] = temp.c_str();
+	glShaderSource(DepthRenderfragmentShaderID, 1, adapter, 0);
+
 	glCompileShader(vertexShaderID);
 	glCompileShader(fragmentShaderID);
 	glCompileShader(PPvertexShaderID);
 	glCompileShader(PPfragmentShaderID);
+	glCompileShader(DepthRendervertexShaderID);
+	glCompileShader(DepthRenderfragmentShaderID);
 
 	if (!checkShaderStatus(vertexShaderID)
 		|| !checkShaderStatus(fragmentShaderID)
 		|| !checkShaderStatus(PPvertexShaderID)
 		|| !checkShaderStatus(PPfragmentShaderID)
+		|| !checkShaderStatus(DepthRendervertexShaderID)
+		|| !checkShaderStatus(DepthRenderfragmentShaderID)
 		) {
 		return;
 	}
@@ -450,7 +498,12 @@ void GLDisplayWidget::installShaders() {
 	glAttachShader(PostProcessingProgramID, PPfragmentShaderID);
 	glLinkProgram(PostProcessingProgramID);
 
-	if (!checkProgramStatus(PassThroughProgramID) || !checkProgramStatus(PostProcessingProgramID)) {
+	DepthRenderProgramID = glCreateProgram();
+	glAttachShader(DepthRenderProgramID, DepthRendervertexShaderID);
+	glAttachShader(DepthRenderProgramID, DepthRenderfragmentShaderID);
+	glLinkProgram(DepthRenderProgramID);
+
+	if (!checkProgramStatus(PassThroughProgramID) || !checkProgramStatus(PostProcessingProgramID) || !checkProgramStatus(DepthRenderProgramID)) {
 		return;
 	}
 }
