@@ -52,7 +52,7 @@ GLDisplayWidget::GLDisplayWidget()
 	printf("read obj is %s", ReadObjName);
 
 	ambientAmount = glm::vec3(0.05f, 0.05f, 0.05f);
-	pointLight1Position = glm::vec3(0.00f, 10.00f,7.5f);
+	pointLight1Position = glm::vec3(0.00f, 5.00f,3.25f);
 	RenderCamera->position = glm::vec3(0.0f, 0.0f,10.0f);
 	LightCamera->position = pointLight1Position;
 	LightCamera->UP = glm::vec3(0.0, -1.0, 0.0);
@@ -167,6 +167,23 @@ void GLDisplayWidget::paintGL() {
 
 	glBindVertexArray(planeVertexArrayObjectID);
 	glDrawElements(GL_TRIANGLES, planeIndices, GL_UNSIGNED_SHORT, 0);
+
+	//------------Draw light plane------------------
+	modelTransformMatrix = glm::translate(mat4(), pointLight1Position); // Because I scale by 0.2, I need to cut my BBOX by 0.2
+	modelRotateMatrix = glm::rotate(mat4(), 0.0f, glm::vec3(1.0f, 1.0f, 1.0f));
+	modelScaleMatrix = glm::scale(mat4(), glm::vec3(0.02f, 0.02f, 0.02f));
+
+	ModelToWorldMatrix = modelTransformMatrix * modelRotateMatrix *  modelScaleMatrix;
+	ModelToViewMatrix = RenderCamera->getWorldToViewMatrix() * ModelToWorldMatrix;
+	fullTransformMatrix = projectionMatrix * ModelToViewMatrix;
+	glUseProgram(PostProcessingProgramID);
+	fullTransformMatrixUniformLocation = glGetUniformLocation(PostProcessingProgramID, "modelToProjectionMatrix");
+	glUniformMatrix4fv(fullTransformMatrixUniformLocation, 1, GL_FALSE, &fullTransformMatrix[0][0]);
+
+	
+	glDrawElements(GL_TRIANGLES, planeIndices, GL_UNSIGNED_SHORT, 0);
+
+
 	////---------Debug frame buffer-------------------
 	//glViewport(0, 0, width(), height());
 	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
