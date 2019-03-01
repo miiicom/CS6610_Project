@@ -21,6 +21,7 @@ public:
 	MeCamera * RenderCamera;
 	MeCamera * LightCamera;
 	const char* ReadObjName;
+	glm::vec3 pointLight1Position;
 protected:
 	void paintGL();
 	void initializeGL();
@@ -47,7 +48,7 @@ private:
 	glm::mat4 modelRotateMatrix;
 	glm::mat4 modelScaleMatrix;
 	glm::mat4 projectionMatrix;
-	glm::vec3 pointLight1Position;
+	//glm::vec3 pointLight1Position;
 	glm::vec3 ambientAmount;
 	float pointLight1Intensity;
 	QImage loadTexture(const char * texName);

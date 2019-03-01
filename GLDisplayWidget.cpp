@@ -52,8 +52,8 @@ GLDisplayWidget::GLDisplayWidget()
 	printf("read obj is %s", ReadObjName);
 
 	ambientAmount = glm::vec3(0.05f, 0.05f, 0.05f);
-	pointLight1Position = glm::vec3(0.00f, 10.00f,7.50f);
-	RenderCamera->position = glm::vec3(0.0f, 0.0f,5.0f);
+	pointLight1Position = glm::vec3(0.00f, 10.00f,7.5f);
+	RenderCamera->position = glm::vec3(0.0f, 0.0f,10.0f);
 	LightCamera->position = pointLight1Position;
 	LightCamera->UP = glm::vec3(0.0, -1.0, 0.0);
 	LightCamera->viewDirection = -pointLight1Position; //set up light camera so it is always looking at center
@@ -567,7 +567,5 @@ void GLDisplayWidget::installShaders() {
 void GLDisplayWidget::setPointLightPosition(float Xmovement, float Ymovement)
 {
 	glm::vec3 previousPosition = this->pointLight1Position;
-	XDegree += Xmovement / 100;
-	YDegree += Ymovement / 100;
-	this->pointLight1Position = glm::vec3(sin(XDegree) * 100,cos(YDegree) * 100, previousPosition.z);
+	this->pointLight1Position = glm::vec3(previousPosition.x + Xmovement/10, previousPosition.y + Ymovement/10, previousPosition.z);
 }

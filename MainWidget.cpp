@@ -141,17 +141,22 @@ void MainWidget::mouseMoveEvent(QMouseEvent * event)
 	if (event->buttons() & Qt::LeftButton) {
 		if (IsCtrlPressing) {
 			displayWidget->setPointLightPosition(xMovement, yMovement); //Change light Position
+			displayWidget->LightCamera->position = displayWidget->pointLight1Position;
+			displayWidget->LightCamera->viewDirection = -displayWidget->pointLight1Position;
 			displayWidget->repaint();
+			return;
 		}
 		if (IsAltPressing){ //Do this to meCamera
 			displayWidget->meCamera->mouseUpdate(glm::vec2(xMovement, yMovement));
 			printf("Dragging in main Widget\n");
 			displayWidget->repaint();
+			return;
 		} 
 		else{ //Do to render camera
 			displayWidget->RenderCamera->mouseUpdate(glm::vec2(xMovement, yMovement));
 			printf("Dragging in main Widget\n");
 			displayWidget->repaint();
+			return;
 		}
 	}
 
