@@ -1,8 +1,9 @@
 ﻿  GLDisplayWidget.cpp
 c:\users\u1137972\source\repos\cs6610_project\shapedata.h(4): warning C4099: 'Vertex': type name first seen using 'struct' now seen using 'class'
   c:\users\u1137972\source\repos\cs6610_project\vertex.h(5): note: see declaration of 'Vertex'
-c:\users\u1137972\source\repos\cs6610_project\gldisplaywidget.cpp(77): warning C4305: 'argument': truncation from 'double' to 'GLclampf'
-c:\users\u1137972\source\repos\cs6610_project\gldisplaywidget.cpp(396): warning C4018: '<': signed/unsigned mismatch
-c:\users\u1137972\source\repos\cs6610_project\gldisplaywidget.cpp(401): warning C4018: '<': signed/unsigned mismatch
-c:\users\u1137972\source\repos\cs6610_project\gldisplaywidget.cpp(412): warning C4018: '<': signed/unsigned mismatch
+c:\users\u1137972\source\repos\cs6610_project\gldisplaywidget.cpp(78): warning C4305: 'argument': truncation from 'double' to 'GLclampf'
+c:\users\u1137972\source\repos\cs6610_project\gldisplaywidget.cpp(138): warning C4102: 'glm': unreferenced label
+c:\users\u1137972\source\repos\cs6610_project\gldisplaywidget.cpp(433): warning C4018: '<': signed/unsigned mismatch
+c:\users\u1137972\source\repos\cs6610_project\gldisplaywidget.cpp(438): warning C4018: '<': signed/unsigned mismatch
+c:\users\u1137972\source\repos\cs6610_project\gldisplaywidget.cpp(449): warning C4018: '<': signed/unsigned mismatch
   CS6610_Project.vcxproj -> C:\Users\U1137972\source\repos\CS6610_Project\Debug\CS6610_Project.exe

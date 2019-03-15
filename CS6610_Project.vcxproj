@@ -139,6 +139,9 @@
   <ItemGroup>
     <None Include="shaders\DepthRenderFragmentShader.glsl" />
     <None Include="shaders\DepthRenderVertexShader.glsl" />
+    <None Include="shaders\OutlineFragmentShader.glsl" />
+    <None Include="shaders\OutlineGeometryShader.glsl" />
+    <None Include="shaders\OutlineVertexShader.glsl" />
     <None Include="shaders\passThroughFragmentShader.glsl" />
     <None Include="shaders\passThroughVertexShader.glsl" />
     <None Include="shaders\PostProcessingFragmentShader.glsl" />

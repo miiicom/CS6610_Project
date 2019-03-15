@@ -17,6 +17,7 @@ const uint VERTEX_BYTE_SIZE = NUM_FLOATS_PER_VERTICE * sizeof(float);
 GLuint PassThroughProgramID;
 GLuint PostProcessingProgramID;
 GLuint DepthRenderProgramID;
+GLuint OutlineProgramID;
 
 GLuint cubeVertexBufferID;
 GLuint cubeIndexBufferID;
@@ -115,7 +116,7 @@ void GLDisplayWidget::paintGL() {
 	glEnable(GL_DEPTH_TEST);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-	glUseProgram(PassThroughProgramID);
+	glUseProgram(OutlineProgramID);
 
 	projectionMatrix = glm::perspective(60.0f, ((float)width()) / height(), 0.01f, 50.0f);
 	modelTransformMatrix = glm::translate(mat4(), glm::vec3(0.0f, 0.0f, 0.0f)); // Because I scale by 0.2, I need to cut my BBOX by 0.2
@@ -144,6 +145,37 @@ void GLDisplayWidget::paintGL() {
 	
 	//glActiveTexture(GL_TEXTURE2);
 	//glBindTexture(GL_TEXTURE_2D, framebufferTexture);
+	fullTransformMatrixUniformLocation = glGetUniformLocation(OutlineProgramID, "modelToProjectionMatrix");
+	glUniformMatrix4fv(fullTransformMatrixUniformLocation, 1, GL_FALSE, &fullTransformMatrix[0][0]);
+	//GLint BiasMVPUniformLocation = glGetUniformLocation(OutlineProgramID, "BiasmodelToProjectionMatrix");
+	//glUniformMatrix4fv(BiasMVPUniformLocation, 1, GL_FALSE, &DepthBiasFullTransformMatrix[0][0]);
+	//GLint modelToWroldMatrixUniformLocation = glGetUniformLocation(OutlineProgramID, "modelToWorldTransMatrix");
+	//glUniformMatrix4fv(modelToWroldMatrixUniformLocation, 1, GL_FALSE, &ModelToWorldMatrix[0][0]);
+	//GLint ambientUniformLocation = glGetUniformLocation(OutlineProgramID, "ambientLightUniform");
+	//glUniform3fv(ambientUniformLocation, 1, &ambientAmount[0]);
+	//GLint Light1PositionUniformLocation = glGetUniformLocation(OutlineProgramID, "pointLightPosition");
+	//glUniform3fv(Light1PositionUniformLocation, 1, &pointLight1Position[0]);
+	//GLint Light1IntensityUniformLocation = glGetUniformLocation(OutlineProgramID, "pointLightIntensity");
+	//glUniform1f(Light1PositionUniformLocation, pointLight1Intensity);
+	//GLuint cameraUniformLocation = glGetUniformLocation(OutlineProgramID, "cameraPositionWorld");
+	//glm::vec3 cameraPosition = meCamera->position;
+	//glUniform3fv(cameraUniformLocation, 1, &cameraPosition[0]);
+	//GLuint diffuseMapUniformLocation = glGetUniformLocation(OutlineProgramID, "diffuseTexture");
+	//glUniform1i(diffuseMapUniformLocation, 0);
+	//GLuint speculareMapUniformLocation = glGetUniformLocation(OutlineProgramID, "specularTexture");
+	//glUniform1i(speculareMapUniformLocation, 1);
+	//GLuint normalMapUniformLocation = glGetUniformLocation(OutlineProgramID, "normalTexture");
+	//glUniform1i(normalMapUniformLocation, 4);
+	//glActiveTexture(GL_TEXTURE2);
+	//glBindTexture(GL_TEXTURE_2D, framebufferTexture);
+	//GLuint framebufferTextureUniformLoc = glGetUniformLocation(OutlineProgramID, "frameBufferTexture");
+	//glUniform1i(framebufferTextureUniformLoc, 2);
+
+	glBindVertexArray(planeVertexArrayObjectID);
+	glDrawElements(GL_TRIANGLES, planeIndices, GL_UNSIGNED_SHORT, 0);
+
+	//-----------Draw actual mesh-------------------
+	glUseProgram(PassThroughProgramID);
 	fullTransformMatrixUniformLocation = glGetUniformLocation(PassThroughProgramID, "modelToProjectionMatrix");
 	glUniformMatrix4fv(fullTransformMatrixUniformLocation, 1, GL_FALSE, &fullTransformMatrix[0][0]);
 	GLint BiasMVPUniformLocation = glGetUniformLocation(PassThroughProgramID, "BiasmodelToProjectionMatrix");
@@ -170,7 +202,6 @@ void GLDisplayWidget::paintGL() {
 	GLuint framebufferTextureUniformLoc = glGetUniformLocation(PassThroughProgramID, "frameBufferTexture");
 	glUniform1i(framebufferTextureUniformLoc, 2);
 
-	glBindVertexArray(planeVertexArrayObjectID);
 	glDrawElements(GL_TRIANGLES, planeIndices, GL_UNSIGNED_SHORT, 0);
 
 	//------------Draw light plane------------------
@@ -535,6 +566,9 @@ void GLDisplayWidget::installShaders() {
 	GLuint  PPfragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
 	GLuint  DepthRendervertexShaderID = glCreateShader(GL_VERTEX_SHADER);
 	GLuint  DepthRenderfragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
+	GLuint  OutlinevertexShaderID = glCreateShader(GL_VERTEX_SHADER);
+	GLuint  OutlinefragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
+	GLuint  OutlineGeometryShaderID = glCreateShader(GL_GEOMETRY_SHADER);
 
 	string temp = readShaderCode("shaders/passThroughVertexShader.glsl");
 	const GLchar* adapter[1];
@@ -562,12 +596,27 @@ void GLDisplayWidget::installShaders() {
 	adapter[0] = temp.c_str();
 	glShaderSource(DepthRenderfragmentShaderID, 1, adapter, 0);
 
+	temp = readShaderCode("shaders/OutlineVertexShader.glsl");
+	adapter[0] = temp.c_str();
+	glShaderSource(OutlinevertexShaderID, 1, adapter, 0);
+
+	temp = readShaderCode("shaders/OutlineFragmentShader.glsl");
+	adapter[0] = temp.c_str();
+	glShaderSource(OutlinefragmentShaderID, 1, adapter, 0);
+
+	temp = readShaderCode("shaders/OutlineGeometryShader.glsl");
+	adapter[0] = temp.c_str();
+	glShaderSource(OutlineGeometryShaderID, 1, adapter, 0);
+
 	glCompileShader(vertexShaderID);
 	glCompileShader(fragmentShaderID);
 	glCompileShader(PPvertexShaderID);
 	glCompileShader(PPfragmentShaderID);
 	glCompileShader(DepthRendervertexShaderID);
 	glCompileShader(DepthRenderfragmentShaderID);
+	glCompileShader(OutlinevertexShaderID);
+	glCompileShader(OutlinefragmentShaderID);
+	glCompileShader(OutlineGeometryShaderID);
 
 	if (!checkShaderStatus(vertexShaderID)
 		|| !checkShaderStatus(fragmentShaderID)
@@ -575,6 +624,9 @@ void GLDisplayWidget::installShaders() {
 		|| !checkShaderStatus(PPfragmentShaderID)
 		|| !checkShaderStatus(DepthRendervertexShaderID)
 		|| !checkShaderStatus(DepthRenderfragmentShaderID)
+		|| !checkShaderStatus(OutlinevertexShaderID)
+		|| !checkShaderStatus(OutlinefragmentShaderID)
+		|| !checkShaderStatus(OutlineGeometryShaderID)
 		) {
 		return;
 	}
@@ -594,7 +646,13 @@ void GLDisplayWidget::installShaders() {
 	glAttachShader(DepthRenderProgramID, DepthRenderfragmentShaderID);
 	glLinkProgram(DepthRenderProgramID);
 
-	if (!checkProgramStatus(PassThroughProgramID) || !checkProgramStatus(PostProcessingProgramID) || !checkProgramStatus(DepthRenderProgramID)) {
+	OutlineProgramID = glCreateProgram();
+	glAttachShader(OutlineProgramID, OutlinevertexShaderID);
+	glAttachShader(OutlineProgramID, OutlinefragmentShaderID);
+	glAttachShader(OutlineProgramID, OutlineGeometryShaderID);
+	glLinkProgram(OutlineProgramID);
+
+	if (!checkProgramStatus(PassThroughProgramID) || !checkProgramStatus(PostProcessingProgramID) || !checkProgramStatus(DepthRenderProgramID) || !checkProgramStatus(OutlineProgramID)) {
 		return;
 	}
 }

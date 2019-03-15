@@ -34,6 +34,15 @@
     <None Include="shaders\DepthRenderFragmentShader.glsl">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="shaders\OutlineVertexShader.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\OutlineGeometryShader.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\OutlineFragmentShader.glsl">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Shaders">
