@@ -1,9 +1,6 @@
 #version 430
 
-
 out vec4 FragmentColor;
-
-
 
 void main()
 {
