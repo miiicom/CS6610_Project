@@ -162,14 +162,11 @@ void GLDisplayWidget::paintGL() {
 	GLuint framebufferTextureUniformLoc = glGetUniformLocation(PassThroughProgramID, "frameBufferTexture");
 	glUniform1i(framebufferTextureUniformLoc, 2);
 
-	glBindVertexArray(teapotVertexArrayObjectID);
-	glDrawElements(GL_TRIANGLES, teapotIndices, GL_UNSIGNED_INT, 0);
-
 	glBindVertexArray(planeVertexArrayObjectID);
 	glDrawElements(GL_TRIANGLES, planeIndices, GL_UNSIGNED_SHORT, 0);
 
 	//------------Draw light plane------------------
-	modelTransformMatrix = glm::translate(mat4(), pointLight1Position); // Because I scale by 0.2, I need to cut my BBOX by 0.2
+	modelTransformMatrix = glm::translate(mat4(), pointLight1Position); 
 	modelRotateMatrix = glm::rotate(mat4(), 0.0f, glm::vec3(1.0f, 1.0f, 1.0f));
 	modelScaleMatrix = glm::scale(mat4(), glm::vec3(0.02f, 0.02f, 0.02f));
 
