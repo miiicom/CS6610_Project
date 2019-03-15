@@ -157,6 +157,8 @@ void GLDisplayWidget::paintGL() {
 	glUniform1i(diffuseMapUniformLocation, 0);
 	GLuint speculareMapUniformLocation = glGetUniformLocation(PassThroughProgramID, "specularTexture");
 	glUniform1i(speculareMapUniformLocation, 1);
+	GLuint normalMapUniformLocation = glGetUniformLocation(PassThroughProgramID, "normalTexture");
+	glUniform1i(normalMapUniformLocation, 4);
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, framebufferTexture);
 	GLuint framebufferTextureUniformLoc = glGetUniformLocation(PassThroughProgramID, "frameBufferTexture");
@@ -369,6 +371,19 @@ void GLDisplayWidget::sendDataToOpenGL() {
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
 		GL_LINEAR);
 
+	QImage NormalMap = loadTexture("Textures/teapot_normal.png");
+	// send Image to OpenGL
+	glActiveTexture(GL_TEXTURE4);
+	GLuint normaltextureID;
+	glGenTextures(1, &normaltextureID);
+	glBindTexture(GL_TEXTURE_2D, normaltextureID);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, NormalMap.width(),
+		NormalMap.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE,
+		NormalMap.bits());
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+		GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+		GL_LINEAR);
 
 	teapot.ComputeBoundingBox();
 	if (teapot.IsBoundBoxReady()) {

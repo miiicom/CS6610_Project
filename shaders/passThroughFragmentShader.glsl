@@ -13,24 +13,24 @@ uniform vec3 cameraPositionWorld;
 
 uniform sampler2D diffuseTexture;
 uniform sampler2D specularTexture;
+uniform sampler2D normalTexture;
 uniform sampler2D frameBufferTexture;
 
 void main()
 {
 	vec4 diffuseColor = texture(diffuseTexture, fragmentUV);
-	vec4 specularColor = texture(specularTexture, fragmentUV);
-	
+	vec3 normalObj = texture(normalTexture, fragmentUV).xyz * 2 - 1;	//For this particular assignment I can assume normal Obj = normal World.
 	// diffuse
 	vec3 lightVectorWorld = normalize(pointLightPosition - VertexPositionWorld);
-	float diffuseIntensity = dot(lightVectorWorld,normalize(NormalWorld));
+	float diffuseIntensity = dot(lightVectorWorld,normalize(normalObj));
 	vec4 diffuseLight = vec4(diffuseColor.x *diffuseIntensity,diffuseColor.y *diffuseIntensity,diffuseColor.z * diffuseIntensity,1.0);
 
 	//specular
-	vec3 reflectedLightVectorWorld = reflect(lightVectorWorld, normalize(NormalWorld));
+	vec3 reflectedLightVectorWorld = reflect(lightVectorWorld, normalize(normalObj));
 	vec3 cameraToWorld = -normalize(cameraPositionWorld - VertexPositionWorld);
 	float SpecIntensity =  dot(cameraToWorld,reflectedLightVectorWorld);
 	SpecIntensity = pow(SpecIntensity,6);
-	vec4 specLight = specularColor.x * vec4(SpecIntensity,SpecIntensity,SpecIntensity,1.0);
+	vec4 specLight =  vec4(SpecIntensity,SpecIntensity,SpecIntensity,1.0);
 
 	vec2 poissonDisk[4] = vec2[](
 		vec2( -0.94201624, -0.39906216 ),
