@@ -134,6 +134,12 @@ void GLDisplayWidget::paintGL() {
 		0.5, 0.5, 0.5, 1.0
 	);
 
+	glm:mat3 viewportMatrix(
+		width() / 2, 0, width() / 2 + 1,
+		0, height() / 2, height() / 2 + 1,
+		0, 0, 1
+	);
+
 	glm::mat4 DepthBiasFullTransformMatrix = biasMatrix * DepthfullTransformMatrix;
 	
 	//glActiveTexture(GL_TEXTURE2);
