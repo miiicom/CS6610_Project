@@ -51,8 +51,8 @@ void main()
 	p00*bu[0]*bv[0] + p01*bu[0]*bv[1] + p02*bu[0]*bv[2] +     
 	p03*bu[0]*bv[3];
 
-	//te_out.position  = gl_TessCoord.x * te_in[0].position;
-    //te_out.position += gl_TessCoord.y * te_in[1].position;
-    //te_out.position += gl_TessCoord.z * te_in[2].position;
-	gl_Position = TEPosition;
+	te_out.position  = gl_TessCoord.x * te_in[0].position;
+   te_out.position += gl_TessCoord.y * te_in[1].position;
+    te_out.position += gl_TessCoord.z * te_in[2].position;
+	gl_Position = te_out.position;
 }

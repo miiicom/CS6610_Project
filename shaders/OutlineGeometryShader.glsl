@@ -1,5 +1,5 @@
 #version 430
-layout (points) in;
+layout (triangles) in;
 layout (line_strip, max_vertices = 4) out;
 
 
