@@ -147,6 +147,8 @@ void GLDisplayWidget::paintGL() {
 	//glBindTexture(GL_TEXTURE_2D, framebufferTexture);
 	fullTransformMatrixUniformLocation = glGetUniformLocation(OutlineProgramID, "modelToProjectionMatrix");
 	glUniformMatrix4fv(fullTransformMatrixUniformLocation, 1, GL_FALSE, &fullTransformMatrix[0][0]);
+	GLint tessellationLevelUniformLocation = glGetUniformLocation(OutlineProgramID, "TessLevel");
+	glUniform1i(tessellationLevelUniformLocation, 1);
 	//GLint BiasMVPUniformLocation = glGetUniformLocation(OutlineProgramID, "BiasmodelToProjectionMatrix");
 	//glUniformMatrix4fv(BiasMVPUniformLocation, 1, GL_FALSE, &DepthBiasFullTransformMatrix[0][0]);
 	//GLint modelToWroldMatrixUniformLocation = glGetUniformLocation(OutlineProgramID, "modelToWorldTransMatrix");
@@ -172,7 +174,8 @@ void GLDisplayWidget::paintGL() {
 	//glUniform1i(framebufferTextureUniformLoc, 2);
 
 	glBindVertexArray(planeVertexArrayObjectID);
-	glDrawElements(GL_TRIANGLES, planeIndices, GL_UNSIGNED_SHORT, 0);
+	glPatchParameteri(GL_PATCH_VERTICES, 4);
+	glDrawElements(GL_PATCHES, planeIndices, GL_UNSIGNED_SHORT, 0);
 
 	//-----------Draw actual mesh-------------------
 	glUseProgram(PassThroughProgramID);
@@ -569,6 +572,8 @@ void GLDisplayWidget::installShaders() {
 	GLuint  OutlinevertexShaderID = glCreateShader(GL_VERTEX_SHADER);
 	GLuint  OutlinefragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
 	GLuint  OutlineGeometryShaderID = glCreateShader(GL_GEOMETRY_SHADER);
+	GLuint  TessellationControlShaderID = glCreateShader(GL_TESS_CONTROL_SHADER);
+	GLuint  TessellationEvaluationShaderID = glCreateShader(GL_TESS_EVALUATION_SHADER);
 
 	string temp = readShaderCode("shaders/passThroughVertexShader.glsl");
 	const GLchar* adapter[1];
@@ -608,6 +613,14 @@ void GLDisplayWidget::installShaders() {
 	adapter[0] = temp.c_str();
 	glShaderSource(OutlineGeometryShaderID, 1, adapter, 0);
 
+	temp = readShaderCode("shaders/TessellationControlShader.glsl");
+	adapter[0] = temp.c_str();
+	glShaderSource(TessellationControlShaderID, 1, adapter, 0);
+
+	temp = readShaderCode("shaders/TessellationEvalutionShader.glsl");
+	adapter[0] = temp.c_str();
+	glShaderSource(TessellationEvaluationShaderID, 1, adapter, 0);
+
 	glCompileShader(vertexShaderID);
 	glCompileShader(fragmentShaderID);
 	glCompileShader(PPvertexShaderID);
@@ -617,6 +630,8 @@ void GLDisplayWidget::installShaders() {
 	glCompileShader(OutlinevertexShaderID);
 	glCompileShader(OutlinefragmentShaderID);
 	glCompileShader(OutlineGeometryShaderID);
+	glCompileShader(TessellationControlShaderID);
+	glCompileShader(TessellationEvaluationShaderID);
 
 	if (!checkShaderStatus(vertexShaderID)
 		|| !checkShaderStatus(fragmentShaderID)
@@ -627,6 +642,8 @@ void GLDisplayWidget::installShaders() {
 		|| !checkShaderStatus(OutlinevertexShaderID)
 		|| !checkShaderStatus(OutlinefragmentShaderID)
 		|| !checkShaderStatus(OutlineGeometryShaderID)
+		|| !checkShaderStatus(TessellationControlShaderID)
+		|| !checkShaderStatus(TessellationEvaluationShaderID)
 		) {
 		return;
 	}
@@ -650,6 +667,8 @@ void GLDisplayWidget::installShaders() {
 	glAttachShader(OutlineProgramID, OutlinevertexShaderID);
 	glAttachShader(OutlineProgramID, OutlinefragmentShaderID);
 	glAttachShader(OutlineProgramID, OutlineGeometryShaderID);
+	glAttachShader(OutlineProgramID, TessellationControlShaderID);
+	glAttachShader(OutlineProgramID, TessellationEvaluationShaderID);
 	glLinkProgram(OutlineProgramID);
 
 	if (!checkProgramStatus(PassThroughProgramID) || !checkProgramStatus(PostProcessingProgramID) || !checkProgramStatus(DepthRenderProgramID) || !checkProgramStatus(OutlineProgramID)) {

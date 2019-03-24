@@ -6,8 +6,13 @@ in layout(location=2) vec3 vertexUVModel;
 
 uniform mat4 modelToProjectionMatrix;
 
+out PipelineData {
+    vec4 position;
+} vs_out;
+
 void main()
 {
 	gl_Position = modelToProjectionMatrix * vertexPositionModel;
+	vs_out.position = modelToProjectionMatrix * vertexPositionModel;
 
 }

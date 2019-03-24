@@ -5,11 +5,13 @@ in layout(location=1) vec3 vertexNormalModel;
 in layout(location=2) vec3 vertexUVModel;
 
 uniform mat4 modelToProjectionMatrix;
+uniform mat4 BiasmodelToProjectionMatrix;
 uniform mat4 modelToWorldTransMatrix;
 
 out vec3 NormalWorld;
 out vec3 VertexPositionWorld;
 out vec2 fragmentUV;
+out vec4 shadowCoord;
 
 void main()
 {
@@ -17,4 +19,5 @@ void main()
 	NormalWorld = vec3(modelToWorldTransMatrix * vec4(vertexNormalModel,0));
 	VertexPositionWorld = vec3(modelToWorldTransMatrix * vertexPositionModel);
 	fragmentUV = vec2(vertexUVModel.x,vertexUVModel.y);
+	shadowCoord = BiasmodelToProjectionMatrix * vertexPositionModel;
 }

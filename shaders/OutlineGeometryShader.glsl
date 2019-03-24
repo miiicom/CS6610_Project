@@ -1,5 +1,5 @@
 #version 430
-layout (triangles) in;
+layout (points) in;
 layout (line_strip, max_vertices = 4) out;
 
 
@@ -15,7 +15,7 @@ void main() {
     EmitVertex();
 
 	gl_Position = gl_in[0].gl_Position- vec4(0.0,0.0,0.01,0.0);
-    EmitVertex();
+	EmitVertex();
 
     EndPrimitive();
 }
