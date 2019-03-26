@@ -29,30 +29,12 @@ void basisFunctions(out float[4] b, out float[4] db, float t){
 
 void main()
 {
-	vec4 TEPosition; 
-	float u = gl_TessCoord.x;    
-	float v = gl_TessCoord.y;
+	//Vertex Position Interpolation & Calculation
+	vec4 VertexTempLerp1 = mix(te_in[1].position, te_in[0].position, gl_TessCoord.x);
+	vec4 VertexTempLerp2 = mix(te_in[2].position, te_in[3].position, gl_TessCoord.x);
+	vec4 VertexLerp = mix(VertexTempLerp1, VertexTempLerp2, gl_TessCoord.y);
 
-	// The sixteen control points    
-	vec4 p00 = gl_in[0].gl_Position;    
-	vec4 p01 = gl_in[1].gl_Position;   
-	vec4 p02 = gl_in[2].gl_Position;   
-	vec4 p03 = gl_in[3].gl_Position;   
-
-
-	float bu[4], bv[4];   
-	// Basis functions for u and v  
-	float dbu[4], dbv[4]; 
-	// Derivitives for u and v  
-	basisFunctions(bu, dbu, u);   
-	basisFunctions(bv, dbv, v);
-
-	TEPosition =    
-	p00*bu[0]*bv[0] + p01*bu[0]*bv[1] + p02*bu[0]*bv[2] +     
-	p03*bu[0]*bv[3];
-
-	te_out.position  = gl_TessCoord.x * te_in[0].position;
-   te_out.position += gl_TessCoord.y * te_in[1].position;
-    te_out.position += gl_TessCoord.z * te_in[2].position;
-	gl_Position = te_out.position;
+	te_out.position =VertexLerp;
+	vec4 VertexLerpScreenSpace = modelToProjectionMatrix * te_out.position;
+	gl_Position = VertexLerpScreenSpace;
 }

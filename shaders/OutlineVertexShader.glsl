@@ -12,7 +12,7 @@ out PipelineData {
 
 void main()
 {
-	gl_Position = modelToProjectionMatrix * vertexPositionModel;
-	vs_out.position = modelToProjectionMatrix * vertexPositionModel;
+	//gl_Position = modelToProjectionMatrix * vertexPositionModel;
+	vs_out.position =  vertexPositionModel;
 
 }

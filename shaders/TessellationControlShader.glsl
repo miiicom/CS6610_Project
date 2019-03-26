@@ -1,6 +1,6 @@
 #version 430
 
-layout( vertices=16 ) out;
+layout( vertices=4 ) out;
 uniform int TessLevel;
 
 in PipelineData {
@@ -13,15 +13,16 @@ out PipelineData {
 
 void main()
 {
-	gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
+	//gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
 
 	tc_out[gl_InvocationID].position = tc_in[gl_InvocationID].position;
+	if (gl_InvocationID == 0){
+		gl_TessLevelOuter[0] = float(TessLevel);
+		gl_TessLevelOuter[1] = float(TessLevel);
+		gl_TessLevelOuter[2] = float(TessLevel);
+		gl_TessLevelOuter[3] = float(TessLevel);
 
-	gl_TessLevelOuter[0] = float(TessLevel);
-	gl_TessLevelOuter[1] = float(TessLevel);
-	gl_TessLevelOuter[2] = float(TessLevel);
-	gl_TessLevelOuter[3] = float(TessLevel);
-
-	gl_TessLevelInner[0] = float(TessLevel);
-	gl_TessLevelInner[1] = float(TessLevel);
+		gl_TessLevelInner[0] = float(TessLevel);
+		gl_TessLevelInner[1] = float(TessLevel);
+	}
 }

@@ -148,7 +148,7 @@ void GLDisplayWidget::paintGL() {
 	fullTransformMatrixUniformLocation = glGetUniformLocation(OutlineProgramID, "modelToProjectionMatrix");
 	glUniformMatrix4fv(fullTransformMatrixUniformLocation, 1, GL_FALSE, &fullTransformMatrix[0][0]);
 	GLint tessellationLevelUniformLocation = glGetUniformLocation(OutlineProgramID, "TessLevel");
-	glUniform1i(tessellationLevelUniformLocation, 1);
+	glUniform1i(tessellationLevelUniformLocation, 64);
 	//GLint BiasMVPUniformLocation = glGetUniformLocation(OutlineProgramID, "BiasmodelToProjectionMatrix");
 	//glUniformMatrix4fv(BiasMVPUniformLocation, 1, GL_FALSE, &DepthBiasFullTransformMatrix[0][0]);
 	//GLint modelToWroldMatrixUniformLocation = glGetUniformLocation(OutlineProgramID, "modelToWorldTransMatrix");
