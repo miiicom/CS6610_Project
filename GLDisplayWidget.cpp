@@ -28,6 +28,7 @@ GLuint planeVertexBufferID;
 GLuint planeIndexBufferID;
 GLuint planeVertexArrayObjectID;
 GLuint planeIndices;
+GLushort outlineIndices;
 
 GLuint framebuffer;
 GLuint framebufferTexture;
@@ -361,6 +362,8 @@ void GLDisplayWidget::sendDataToOpenGL() {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, planeIndexBufferID);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, shape.indexBufferSize(), shape.indices, GL_STATIC_DRAW);
 	planeIndices = shape.numIndices;
+	GLushort indices[] = { 0,2,1,3 };
+	//memcpy(outlineIndices, indices, sizeof(indices));
 	shape.cleanup();
 
 	std::ostream *outStream = &std::cout;

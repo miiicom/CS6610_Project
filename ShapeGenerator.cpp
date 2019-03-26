@@ -171,7 +171,7 @@ ShapeData ShapeGenerator::makefillerQuard()
 	ret.vertices = new Vertex[ret.numVertices];
 	memcpy(ret.vertices, verts, sizeof(verts));
 
-	GLushort indices[] = { 0,2,1,2,3,1 };
+	GLushort indices[] = { 0,2,1,3};
 	ret.numIndices = NUM_ARRAY_ELEMENTS(indices);
 	ret.indices = new GLushort[ret.numIndices];
 	memcpy(ret.indices, indices, sizeof(indices));
