@@ -148,6 +148,8 @@ void GLDisplayWidget::paintGL() {
 	//glBindTexture(GL_TEXTURE_2D, framebufferTexture);
 	fullTransformMatrixUniformLocation = glGetUniformLocation(OutlineProgramID, "modelToProjectionMatrix");
 	glUniformMatrix4fv(fullTransformMatrixUniformLocation, 1, GL_FALSE, &fullTransformMatrix[0][0]);
+	GLint modelToWroldMatrixUniformLocation = glGetUniformLocation(OutlineProgramID, "modelToWorldTransMatrix");
+	glUniformMatrix4fv(modelToWroldMatrixUniformLocation, 1, GL_FALSE, &ModelToWorldMatrix[0][0]);
 	GLint tessellationLevelUniformLocation = glGetUniformLocation(OutlineProgramID, "TessLevel");
 	glUniform1i(tessellationLevelUniformLocation, 64);
 	//GLint BiasMVPUniformLocation = glGetUniformLocation(OutlineProgramID, "BiasmodelToProjectionMatrix");
@@ -184,7 +186,7 @@ void GLDisplayWidget::paintGL() {
 	glUniformMatrix4fv(fullTransformMatrixUniformLocation, 1, GL_FALSE, &fullTransformMatrix[0][0]);
 	GLint BiasMVPUniformLocation = glGetUniformLocation(PassThroughProgramID, "BiasmodelToProjectionMatrix");
 	glUniformMatrix4fv(BiasMVPUniformLocation, 1, GL_FALSE, &DepthBiasFullTransformMatrix[0][0]);
-	GLint modelToWroldMatrixUniformLocation = glGetUniformLocation(PassThroughProgramID, "modelToWorldTransMatrix");
+	modelToWroldMatrixUniformLocation = glGetUniformLocation(PassThroughProgramID, "modelToWorldTransMatrix");
 	glUniformMatrix4fv(modelToWroldMatrixUniformLocation, 1, GL_FALSE, &ModelToWorldMatrix[0][0]);
 	GLint ambientUniformLocation = glGetUniformLocation(PassThroughProgramID, "ambientLightUniform");
 	glUniform3fv(ambientUniformLocation, 1, &ambientAmount[0]);

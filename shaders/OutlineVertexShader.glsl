@@ -8,11 +8,14 @@ uniform mat4 modelToProjectionMatrix;
 
 out PipelineData {
     vec4 position;
+	vec3 normal;
+	vec2 fragmentUV;
 } vs_out;
 
 void main()
 {
 	//gl_Position = modelToProjectionMatrix * vertexPositionModel;
 	vs_out.position =  vertexPositionModel;
-
+	vs_out.normal =  vertexNormalModel;
+	vs_out.fragmentUV = vec2(vertexUVModel.x,vertexUVModel.y);
 }
