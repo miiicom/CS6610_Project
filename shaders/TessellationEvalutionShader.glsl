@@ -34,9 +34,9 @@ void main()
 	vec2 VertexTempLerp6 = mix(te_in[2].fragmentUV, te_in[3].fragmentUV, gl_TessCoord.x);
 	vec2 VertexUVLerp = mix(VertexTempLerp5,VertexTempLerp6,gl_TessCoord.y);
 
-	te_out.position =modelToProjectionMatrix * VertexPositionLerp;
-	te_out.normal =vec3(modelToWorldTransMatrix * vec4(VertexNormalLerp,0)); 
+	te_out.position = modelToProjectionMatrix * VertexPositionLerp;
+	te_out.normal = vec3(modelToWorldTransMatrix * vec4(VertexNormalLerp,0)); 
 	te_out.fragmentUV = VertexUVLerp;
-	vec4 VertexLerpScreenSpace = modelToProjectionMatrix * VertexPositionLerp;
+	vec4 VertexLerpScreenSpace = te_out.position;
 	gl_Position = VertexLerpScreenSpace;
 }
